@@ -12,7 +12,10 @@
     "test": "vitest run",
     "test:e2e": "playwright test",
     "prepare:python": "node scripts/prepare-python.mjs",
-    "format": "prettier --write apps content packages scripts tests *.ts *.js *.json *.yaml"
+    "format": "prettier --write apps content packages scripts tests *.ts *.js *.json *.yaml",
+    "dev:api": "node --use-env-proxy --import tsx --watch apps/api/server.ts",
+    "start": "node --use-env-proxy --import tsx apps/api/server.ts",
+    "test:production": "playwright test --config playwright.production.config.ts"
   },
   "dependencies": {
     "pyodide": "0.29.3",
@@ -22,6 +25,7 @@
     "zod": "^4.1.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.11.1",
     "@eslint/js": "^9.39.0",
     "@playwright/test": "^1.56.0",
     "@types/node": "^24.0.0",
@@ -30,6 +34,7 @@
     "@vitejs/plugin-react": "^5.1.0",
     "eslint": "^9.39.0",
     "prettier": "3.8.3",
+    "tsx": "4.21.0",
     "typescript": "^5.9.0",
     "typescript-eslint": "^8.46.0",
     "vite": "^7.2.0",

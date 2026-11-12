@@ -5,7 +5,7 @@
   font-synthesis: none;
   line-height: 1.7;
   --accent: #70cdb6;
-  --muted: #64748b;
+  --muted: #526477;
   --border: #e5ebf1;
 }
 * {
@@ -208,7 +208,7 @@ p {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 2px;
-  color: #54796f;
+  color: #42665c;
   text-transform: uppercase;
 }
 .mint {
@@ -277,7 +277,7 @@ p {
   justify-content: center;
   align-items: center;
   min-width: 210px;
-  color: #498575;
+  color: #346657;
 }
 .diagram i {
   font-style: normal;
@@ -393,7 +393,7 @@ p {
 footer {
   display: flex;
   gap: 18px;
-  color: #71808e;
+  color: #526477;
   font-size: 10px;
   padding: 32px 0;
   margin-top: 70px;

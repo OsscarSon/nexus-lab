@@ -10,16 +10,11 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { academies } from "../../../content/catalog";
+import { Account, AISettings } from "./account";
 import { read, write } from "./storage";
 import "./style.css";
 import { LabDirectory, LabRoute } from "./labs";
-import {
-  ContinueLearning,
-  Course,
-  Lesson,
-  Assessment,
-  getProgress,
-} from "./learning";
+import { ContinueLearning, Course, Lesson, Assessment } from "./learning";
 const nav = [
   ["/home", "⌂", "首页", "Home"],
   ["/learn", "▤", "学习", "Learn"],
@@ -246,26 +241,6 @@ function Projects() {
     </>
   );
 }
-function Me() {
-  return (
-    <section className="prose">
-      <h1>我的学习空间</h1>
-      <div className="card">
-        <h2>本地学习者</h2>
-        <p>
-          无需注册。偏好和进度仅保存在当前浏览器；清除浏览器数据会删除记录。
-        </p>
-        <p>已完成 {getProgress().completed.length} / 6 节开源课程</p>
-        <p>
-          当前方向：
-          {academies.find((a) => a.id === read("nexus-goal", ""))?.title ||
-            "自由探索"}
-        </p>
-        <Link to="/welcome">重新选择方向 →</Link>
-      </div>
-    </section>
-  );
-}
 function Missing() {
   return (
     <>
@@ -348,7 +323,8 @@ function App() {
               <Route path="/lab/:labId" element={<LabRoute />} />
               <Route path="/opensource/git-playground" element={<LabRoute />} />
               <Route path="/projects" element={<Projects />} />
-              <Route path="/me" element={<Me />} />
+              <Route path="/me" element={<Account />} />
+              <Route path="/settings/ai" element={<AISettings />} />
               <Route path="*" element={<Missing />} />
             </Routes>
           </Boundary>

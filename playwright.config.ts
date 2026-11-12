@@ -11,9 +11,20 @@ export default defineConfig({
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
     { name: "mobile", use: { ...devices["Pixel 7"] } },
   ],
-  webServer: {
-    command: "pnpm dev",
-    url: "http://127.0.0.1:5173",
-    reuseExistingServer: true,
-  },
+  webServer: [
+    {
+      command: "pnpm dev",
+      url: "http://127.0.0.1:5173",
+      reuseExistingServer: !process.env.CI,
+    },
+    {
+      command: "pnpm start",
+      url: "http://127.0.0.1:3001/api/health",
+      reuseExistingServer: false,
+      env: {
+        NEXUS_DB_PATH: `.cache/e2e-${Date.now()}.sqlite`,
+        NEXUS_AI_ENABLED: "false",
+      },
+    },
+  ],
 });

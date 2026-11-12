@@ -1,3 +1,4 @@
+import { Mentor } from "./mentor";
 import { useState } from "react";
 import { Link, NavLink, useParams } from "react-router-dom";
 import { lessons } from "../../../content/opensource";
@@ -168,6 +169,7 @@ function LessonBody({ lesson: l }: { lesson: (typeof lessons)[number] }) {
             {next ? "下一课 →" : "进入模块检查 →"}
           </Link>
         )}
+        <Mentor lessonId={l.id} />
         <details>
           <summary>参考与内容说明</summary>
           <p>原创教学内容，版本 {l.version}。尚未经过外部专家审核。</p>

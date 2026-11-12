@@ -1,3 +1,4 @@
+import { Mentor } from "./mentor";
 import { lazy, Suspense, useState, type ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -118,6 +119,7 @@ function Workspace({
       <p role="status" className={feedback ? "feedback" : ""}>
         {feedback}
       </p>
+      <Mentor />
     </section>
   );
 }

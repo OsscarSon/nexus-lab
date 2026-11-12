@@ -44,3 +44,11 @@ Start at `/learn/opensource/foundations`. Six lessons at `/lesson/:lessonId` con
 `/lab/python` lazy-loads a real pinned Pyodide runtime from same-origin assets (~12 MB, copied by dev/build). It runs three curated Python programs in a worker; inputs are integers 0–1000. Loading times out after 45 seconds, execution after 5 seconds; Stop terminates the worker. No arbitrary Python imports, remote packages or server code execution are exposed.
 
 `/lab/spreadsheet` evaluates numeric cells, arithmetic, parentheses and SUM/AVERAGE/MIN/MAX with same-column ranges or comma arguments. Errors are explicit. This is a defined teaching subset, not Excel compatibility. Heavy views are code-split. Retain the entire `dist/` directory, including `vendor/pyodide`, when deploying.
+
+## Optional accounts and Mentor
+
+Start `pnpm dev:api` in a second terminal for accounts, progress synchronization and the Mentor API. `/me` supports username/password accounts, explicit progress merging, logout and account deletion. `/settings/ai` reports actual server enablement and usage. Lessons and Git/logic labs provide contextual Explain, Hint, Debug and Build assistance.
+
+Default behavior is explicitly labeled, non-generative course assistance. No learner key is needed. The server-only OpenAI-compatible adapter has durable per-user and global quotas, conservative cost reservations, timeout/response bounds and fail-closed billing reconciliation. Live AI has **not** been verified: provider credentials and configuration are absent. BYOK is disabled.
+
+For a built application, run `pnpm build` then `pnpm start`. Full environment variables, account data/privacy boundaries, deployment prerequisites, demo steps and the AI credential blocker are documented in [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md). Run `CHROMIUM_PATH=/usr/bin/chromium pnpm test:production` to smoke-test the compiled app and same-origin Python under CSP. GitHub Actions is configured; remote CI and public deployment have not been run.
