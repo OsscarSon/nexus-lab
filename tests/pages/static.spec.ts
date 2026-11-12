@@ -1,3 +1,4 @@
+import { choosePanel } from "../helpers/panels";
 import { test, expect } from "@playwright/test";
 test("subpath routes survive refresh and retain learning progress without backend requests", async ({
   page,
@@ -21,6 +22,7 @@ test("subpath routes survive refresh and retain learning progress without backen
   );
   await page.reload();
   await page.getByRole("link", { name: /什么是源代码/ }).click();
+  await choosePanel(page, "练习");
   await page.getByRole("radio").nth(1).check();
   await page.getByRole("button", { name: "检查答案", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("已保存学习进度");

@@ -6,6 +6,10 @@ test("representative screens have no WCAG A/AA violations or horizontal overflow
   for (const route of [
     "/home",
     "/learn",
+    "/welcome",
+    "/learn/ai",
+    "/learn/opensource/foundations",
+    "/projects",
     "/lesson/os-source",
     "/lab/git",
     "/lab/logic",

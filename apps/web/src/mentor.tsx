@@ -1,5 +1,6 @@
+import { Icon } from "./components/icon";
 import { STATIC_DEPLOYMENT } from "./deployment";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Link } from "react-router-dom";
 import { fallback } from "../../../packages/ai-gateway/fallback";
 import type {
@@ -27,6 +28,7 @@ const reasons: Record<string, string> = {
   "static-deployment": "GitHub Pages 静态版没有生成式 AI 后端",
 };
 export function Mentor({ lessonId }: { lessonId?: string }) {
+  const contentId = useId();
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<MentorRequest["mode"]>("explain");
   const [message, setMessage] = useState("");
@@ -35,16 +37,25 @@ export function Mentor({ lessonId }: { lessonId?: string }) {
   return (
     <section className="mentor">
       <button
-        className="secondary"
+        className="secondary mentor-launch"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
-        aria-controls="mentor-content"
+        aria-controls={contentId}
       >
-        {open ? "收起学习助手" : "需要帮助？打开学习助手"} ✧
+        <Icon name="spark" size={20} />
+        {open ? "收起学习助手" : "需要帮助？打开学习助手"}
       </button>
       {open && (
-        <div id="mentor-content" className="card">
-          <h2>学习助手 · Mentor</h2>
+        <div id={contentId} className="card mentor-card">
+          <div className="mentor-heading">
+            <span className="small-icon">
+              <Icon name="spark" />
+            </span>
+            <div>
+              <h2>学习助手 · Mentor</h2>
+              <small>一步提示，一点新理解。</small>
+            </div>
+          </div>
           <p>
             {STATIC_DEPLOYMENT
               ? "静态版仅提供预先编写的非生成式课程引导，不会发送问题或密钥给服务器。账户与生成式 AI 不可用。"
@@ -54,6 +65,7 @@ export function Mentor({ lessonId }: { lessonId?: string }) {
             教学模式
             <select
               value={mode}
+              disabled={busy}
               onChange={(e) => setMode(e.target.value as MentorRequest["mode"])}
             >
               {modes.map(([id, label]) => (
@@ -63,10 +75,21 @@ export function Mentor({ lessonId }: { lessonId?: string }) {
               ))}
             </select>
           </label>
+          <p className="mode-description">
+            {
+              {
+                explain: "用类比理解概念，再回到准确的定义。",
+                hint: "一次只给一个提示，给你留出思考空间。",
+                debug: "从预期、实际和重现步骤开始，不冒充执行结果。",
+                build: "把目标拆成里程碑和可以验证的小任务。",
+              }[mode]
+            }
+          </p>
           <label>
             你的问题
             <textarea
               value={message}
+              disabled={busy}
               maxLength={2000}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="哪里让你困惑？"
@@ -107,7 +130,21 @@ export function Mentor({ lessonId }: { lessonId?: string }) {
             >
               {busy ? "正在请求…" : "获取帮助"}
             </button>
-            <Link to="/settings/ai">查看额度与 AI 设置 →</Link>
+            <Link className="text-link" to="/settings/ai">
+              查看额度与 AI 设置 →
+            </Link>
+            {(response || message) && (
+              <button
+                className="secondary"
+                disabled={busy}
+                onClick={() => {
+                  setMessage("");
+                  setResponse(null);
+                }}
+              >
+                清空内容
+              </button>
+            )}
           </div>
           {response && (
             <div role="status" className="feedback">

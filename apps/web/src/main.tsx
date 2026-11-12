@@ -26,6 +26,7 @@ import { recordVisit } from "./activity";
 import { Account, AISettings } from "./account";
 
 import "./style.css";
+import "./ui-v2.css";
 import { LabDirectory, LabRoute } from "./labs";
 import { Course, Lesson, Assessment } from "./learning";
 const nav = [
@@ -107,7 +108,13 @@ function Breadcrumb() {
         "/welcome": "选择方向",
       } as Record<string, string>
     )[pathname] ||
-    "探索空间";
+    (pathname.startsWith("/lesson/")
+      ? "课时学习"
+      : pathname.startsWith("/lab/")
+        ? "互动实验室"
+        : pathname.startsWith("/projects/")
+          ? "作品详情"
+          : "探索空间");
   return (
     <span className="breadcrumb">
       探索 <span>/</span> {title}
@@ -172,7 +179,11 @@ function App() {
       <div className="shell">
         <header>
           <Breadcrumb />
-          <Link className="header-search" to="/learn" aria-label="搜索与探索学院">
+          <Link
+            className="header-search"
+            to="/learn"
+            aria-label="搜索与探索学院"
+          >
             <Icon name="search" size={18} />
             <span>搜索与探索学院</span>
           </Link>

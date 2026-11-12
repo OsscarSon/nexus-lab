@@ -21,3 +21,17 @@ describe("learning evidence", () => {
     expect(parseProgress({ completed: "all" }).completed).toEqual([]);
   });
 });
+
+import { fallback } from "../packages/ai-gateway/fallback";
+it("uses neutral authored assistance outside an explicit lesson and keeps lesson hints intact", () => {
+  const neutral = fallback({ mode: "explain", userMessage: "需要帮助" });
+  expect(neutral.providerKind).toBe("fallback");
+  expect(neutral.references).toEqual([]);
+  expect(neutral.answer).not.toContain("源代码像食谱");
+  const hint = fallback({
+    mode: "hint",
+    lessonId: lessons[0].id,
+    userMessage: "需要提示",
+  });
+  expect(hint.answer).toBe(lessons[0].hints[0]);
+});

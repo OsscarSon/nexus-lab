@@ -130,18 +130,38 @@ export function Home() {
   const recent = visits.find((v) => v.kind === "lesson" || v.kind === "lab");
   const lastLesson = lessons.find((l) => l.id === progress.lastLesson);
   const nextLesson = lessons.find((l) => !progress.completed.includes(l.id));
-  const hasLearning = recent || progress.completed.length > 0;
+  const hasLearning = Boolean(
+    recent || progress.completed.length || artifacts.length,
+  );
   const resume = recent
-    ? { title: recent.title, path: recent.path }
-    : lastLesson
+    ? recent.kind === "lesson" &&
+      progress.completed.includes(recent.path.split("/").pop() || "")
       ? {
           title: nextLesson?.title || "开源素养课程回顾",
           path: nextLesson
             ? "/lesson/" + nextLesson.id
             : "/learn/opensource/foundations",
         }
-      : undefined;
+      : { title: recent.title, path: recent.path }
+    : lastLesson || progress.completed.length
+      ? {
+          title: nextLesson?.title || "开源素养课程回顾",
+          path: nextLesson
+            ? "/lesson/" + nextLesson.id
+            : "/learn/opensource/foundations",
+        }
+      : artifacts[0]
+        ? { title: artifacts[0].title, path: artifacts[0].source }
+        : undefined;
   const recentLabs = visits.filter((v) => v.kind === "lab").slice(0, 3);
+  const projectVisits = visits.filter((v) => v.kind === "project");
+  const viewedArtifacts = projectVisits
+    .map((v) => artifacts.find((a) => v.path === "/projects/" + a.id))
+    .filter((a): a is Artifact => Boolean(a));
+  const recentProjects = [
+    ...viewedArtifacts,
+    ...artifacts.filter((a) => !viewedArtifacts.some((v) => v.id === a.id)),
+  ].slice(0, 3);
   return (
     <>
       <PageIntro
@@ -201,9 +221,14 @@ export function Home() {
           {progress.completed.length || artifacts.length ? (
             <>
               <div className="mini-stat">
-                <strong>{progress.completed.length}</strong>
+                <strong>{progress.completed.length || artifacts.length}</strong>
                 <span>
-                  已完成课时<small>开源素养 M01 · 共 6 节</small>
+                  {progress.completed.length ? "已完成课时" : "已验证的练习"}
+                  <small>
+                    {progress.completed.length
+                      ? "开源素养 M01 · 共 6 节"
+                      : "来自实际通过检查的本机记录"}
+                  </small>
                 </span>
               </div>
               {progress.completed.length > 0 && (
@@ -323,13 +348,13 @@ export function Home() {
         </section>
         <section>
           <SectionTitle
-            title="最近的学习成果"
+            title={viewedArtifacts.length ? "最近查看的作品" : "最近的学习成果"}
             to="/projects"
             label="我的作品"
           />
           {artifacts.length ? (
             <div className="card list-card">
-              {artifacts.slice(0, 3).map((a) => (
+              {recentProjects.map((a) => (
                 <RecentArtifact artifact={a} key={a.id} />
               ))}
             </div>
@@ -410,6 +435,7 @@ export function Learn() {
         </div>
         <span className="result-count">{results.length} 个学院</span>
       </div>
+      <h2 className="sr-only">学院目录</h2>
       <div className="grid academy-grid">
         {results.map((a) => (
           <AcademyCard academy={a} key={a.id} />
@@ -603,6 +629,35 @@ export function CourseDetails() {
           ))}
         </ul>
         <p>{academyPlans[a.id].prerequisites}</p>
+        <details className="related-courses">
+          <summary>相关课程与共享练习</summary>
+          <div className="related-links">
+            {academyCourses(a.id)
+              .filter((c) => c.id !== course.id)
+              .map((c) => (
+                <Link
+                  key={c.id}
+                  to={
+                    c.status === "available"
+                      ? c.route
+                      : `/learn/${a.id}/curriculum/${c.id}`
+                  }
+                >
+                  <span>
+                    {c.title}
+                    <small>
+                      {c.status === "planned"
+                        ? " · 规划中"
+                        : c.kind === "practice"
+                          ? " · 实践可用"
+                          : " · 可学习"}
+                    </small>
+                  </span>
+                  <Icon name="arrow" size={16} />
+                </Link>
+              ))}
+          </div>
+        </details>
         {course.status === "available" ? (
           <Link className="button" to={course.route}>
             进入{course.kind === "practice" ? "练习" : "课程"}
@@ -733,8 +788,9 @@ export function ProjectDetail() {
         <Link className="back-link" to="/projects">
           ← 我的作品
         </Link>
+        <h1>这台设备还没有这份成果</h1>
         <EmptyState
-          title="这台设备还没有这份成果"
+          title="从真实练习开始积累"
           to="/projects"
           label="查看本机作品"
         >
@@ -798,8 +854,14 @@ export function ProjectDetail() {
 }
 export function NotFound() {
   return (
-    <EmptyState title="找不到这个页面" to="/home" label="回到首页">
-      换一个入口，继续你的探索。
-    </EmptyState>
+    <>
+      <PageIntro eyebrow="LET’S FIND ANOTHER WAY" title="找不到这个页面">
+        换一个入口，继续你的探索。
+      </PageIntro>
+      <Link className="button" to="/home">
+        回到首页
+        <Icon name="arrow" size={18} />
+      </Link>
+    </>
   );
 }
