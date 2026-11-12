@@ -9,5 +9,5 @@ export const academies = z.array(z.object({id:z.string(),title:z.string(),englis
 {id:'robotics',title:'机器人与物联网',english:'Robotics & IoT',icon:'⚙',description:'让代码与真实世界对话。',available:false},
 {id:'future',title:'未来科技',english:'Future Technology',icon:'↗',description:'探索新技术，保持好奇心。',available:false},
 {id:'workspace',title:'效率与自动化',english:'Workspace & Automation',icon:'▦',description:'用公式与流程，让日常工作更轻松。',available:false},
-{id:'opensource',title:'开源学院',english:'Open Source',icon:'⌥',description:'读懂开源世界，迈出协作的第一步。',available:false}
+{id:'opensource',title:'开源学院',english:'Open Source',icon:'⌥',description:'读懂开源世界，迈出协作的第一步。',available:true}
 ]);

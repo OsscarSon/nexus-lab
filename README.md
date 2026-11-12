@@ -30,3 +30,7 @@ Routes: `/` landing, `/welcome` goal selection, `/home`, `/learn`, `/learn/:acad
 Dependencies: React for rendering, React Router for navigation, Zod for content validation. Vite/TypeScript provide strict compilation, ESLint static checks, Vitest domain tests, and Playwright desktop/mobile functional checks. CSS tokens implement the shared visual system without a styling framework.
 
 See `docs/CURRENT_STATUS.md` for verified scope and limitations. Product specifications remain the source of truth; unimplemented later phases are not presented as working features.
+
+## Open Source M01
+
+Start at `/learn/opensource/foundations`. Six lessons at `/lesson/:lessonId` contain real authored explanations and quizzes. Correct answers persist progress locally. `/learn/opensource/assessment` creates a license-classification worksheet shown in Projects. Lessons can be revisited freely. Content lives in `content/opensource.ts` and is validated with Zod. Nothing connects to or executes an external repository.
