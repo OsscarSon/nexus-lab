@@ -38,3 +38,9 @@ Start at `/learn/opensource/foundations`. Six lessons at `/lesson/:lessonId` con
 ## Interactive labs
 
 `/lab/git`: create a feature branch, edit README to contain `Hello open source`, stage, commit, and check. Staging captures a snapshot; later edits are not silently committed. `/lab/logic`: select AND/OR/XOR/NOT, toggle inputs, predict the truth table and check. Both support undo/reset and save successful evidence locally. These are labeled simulations, never real Git or hardware execution.
+
+## Python and formulas
+
+`/lab/python` lazy-loads a real pinned Pyodide runtime from same-origin assets (~12 MB, copied by dev/build). It runs three curated Python programs in a worker; inputs are integers 0–1000. Loading times out after 45 seconds, execution after 5 seconds; Stop terminates the worker. No arbitrary Python imports, remote packages or server code execution are exposed.
+
+`/lab/spreadsheet` evaluates numeric cells, arithmetic, parentheses and SUM/AVERAGE/MIN/MAX with same-column ranges or comma arguments. Errors are explicit. This is a defined teaching subset, not Excel compatibility. Heavy views are code-split. Retain the entire `dist/` directory, including `vendor/pyodide`, when deploying.

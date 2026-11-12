@@ -1,4 +1,23 @@
-import {describe,it,expect} from 'vitest';
-import {lessons} from '../content/opensource';
-import {complete,parseProgress,grade} from '../packages/lesson-engine';
-describe('learning evidence',()=>{it('validates all six curriculum topics and requires real quiz choices',()=>{expect(lessons).toHaveLength(6);for(const l of lessons){expect(l.options[l.correct]).toBeTruthy();expect(l.segments[0].body.length).toBeGreaterThan(50);}expect(grade([0,1,2],[0,1,2])).toBe(true);expect(grade([0,0,2],[0,1,2])).toBe(false);expect(grade([],[0])).toBe(false);});it('deduplicates completion and rejects unknown content',()=>{const p=complete(complete(parseProgress(null),'a',['a']),'a',['a']);expect(p.completed).toEqual(['a']);expect(()=>complete(p,'unknown',['a'])).toThrow();});it('recovers from malformed local storage',()=>{expect(parseProgress({completed:'all'}).completed).toEqual([]);});});
+import { describe, it, expect } from "vitest";
+import { lessons } from "../content/opensource";
+import { complete, parseProgress, grade } from "../packages/lesson-engine";
+describe("learning evidence", () => {
+  it("validates all six curriculum topics and requires real quiz choices", () => {
+    expect(lessons).toHaveLength(6);
+    for (const l of lessons) {
+      expect(l.options[l.correct]).toBeTruthy();
+      expect(l.segments[0].body.length).toBeGreaterThan(50);
+    }
+    expect(grade([0, 1, 2], [0, 1, 2])).toBe(true);
+    expect(grade([0, 0, 2], [0, 1, 2])).toBe(false);
+    expect(grade([], [0])).toBe(false);
+  });
+  it("deduplicates completion and rejects unknown content", () => {
+    const p = complete(complete(parseProgress(null), "a", ["a"]), "a", ["a"]);
+    expect(p.completed).toEqual(["a"]);
+    expect(() => complete(p, "unknown", ["a"])).toThrow();
+  });
+  it("recovers from malformed local storage", () => {
+    expect(parseProgress({ completed: "all" }).completed).toEqual([]);
+  });
+});

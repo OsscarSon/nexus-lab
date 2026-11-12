@@ -1,11 +1,152 @@
-import {z} from 'zod';
-const lessonSchema=z.object({id:z.string(),moduleId:z.literal('os-m01'),title:z.string(),locale:z.literal('zh-Hans'),summary:z.string(),objectives:z.array(z.string()),prerequisites:z.array(z.string()),estimatedMinutes:z.number(),segments:z.array(z.object({heading:z.string(),body:z.string()})),example:z.string(),question:z.string(),options:z.array(z.string()).length(3),correct:z.number().int().min(0).max(2),explanation:z.string(),hints:z.array(z.string()),evidenceRequirements:z.array(z.string()),references:z.array(z.object({title:z.string(),url:z.url()})),reviewedAt:z.null(),version:z.literal(1)});
-const seeds=[
-{id:'os-source',title:'什么是源代码？',summary:'看见软件背后可读的指令。',objective:'区分源代码、运行结果与文档。',heading:'食谱与成品',body:'源代码像食谱：用程序语言写下每一步指令。运行程序像照着食谱做饭，屏幕上的结果像成品。README 是使用说明，不等于所有源代码。阅读代码可以帮助理解行为；运行陌生代码前仍需要检查来源和权限。',example:'print("你好，世界") 是 Python 源代码。屏幕显示的「你好，世界」是运行结果。',question:'下面哪一个是源代码？',options:['屏幕上的欢迎图片','print("你好") 这条指令','应用商店的评分'],correct:1,explanation:'源代码是开发者可阅读和修改的指令；图片和评分是输出或元数据。',hint:'寻找描述「该做什么」的指令，而不是已经显示出来的结果。'},
-{id:'os-permissions',title:'免费、开源与可见源码',summary:'价格不决定你可以怎样使用代码。',objective:'用授权条款判断开放程度。',heading:'看得见，不等于有许可',body:'免费只描述价格。开源要求许可证授予使用、研究、修改和再分发等权利，并满足 Open Source Definition。Source-available 表示源码可见，却可能禁止商业使用或限制用途。公开仓库没有许可证时，不应假设拥有修改和分发权。',example:'一个免费应用可以完全闭源；一个 MIT 项目可以收费销售，但要遵守许可证的声明保留要求。',question:'公开仓库没有 LICENSE，应该怎么做？',options:['直接复制并发布','假设它属于公有领域','先确认授权，不推定可复用'],correct:2,explanation:'公开可见不自动授予再分发权。应核实权利人与许可证。',hint:'访问权限与法律授权是两件不同的事。'},
-{id:'os-community',title:'社区与维护者',summary:'软件由人一起维护。',objective:'选择尊重社区的提问方式。',heading:'协作先从理解开始',body:'维护者负责审查贡献、管理发布和项目方向。贡献者可以提交文档、翻译、问题报告或代码。先读 README、CONTRIBUTING 和行为准则；提问时提供重现步骤、预期与实际结果，不要求志愿者立即回复。',example:'问题报告：在版本 1.2 点击「保存」，预期保存文件，实际显示权限错误；附最小重现步骤，移除私人信息。',question:'第一次报告问题，哪种做法最有帮助？',options:['提供版本与最小重现步骤','重复发送「快点修」','公开粘贴账户密码'],correct:0,explanation:'可重现的描述帮助维护者定位问题，也应避免泄露私人信息。',hint:'让别人能够理解并复现同一个问题。'},
-{id:'os-library',title:'库与应用',summary:'分清积木与完整作品。',objective:'区分供开发者调用的库与直接使用的应用。',heading:'可复用的积木',body:'库为其他程序提供功能，例如日期计算、图表或界面组件。应用通常提供完整用户流程。一个项目可能同时提供命令行应用和库。判断时看它面向谁、如何安装和使用，而不是只看仓库名字。',example:'React 是构建界面的库；一个用 React 制作的学习网站是应用。两者都可以开源。',question:'给其他程序提供日期计算函数的包，更接近什么？',options:['软件许可证','代码库 Library','用户评分'],correct:1,explanation:'可供其他程序调用的功能集合属于库。',hint:'它是给开发者使用的积木，还是直接完成用户任务的成品？'},
-{id:'os-trust',title:'信任与软件供应链',summary:'开源可以检查，但不是自动安全。',objective:'识别依赖安装前的必要检查。',heading:'信任需要证据',body:'软件供应链包括源码、维护者、依赖、构建工具与发布产物。星标多不等于安全。阅读安装命令、确认来源、锁定依赖、检查发布与审查记录。绝不在不了解用途时向陌生脚本交出管理员权限或密钥。',example:'看到 curl ... | sh，先检查下载地址和脚本内容、验证可信发布来源，再在隔离环境评估。此课程不会运行外部仓库。',question:'安装未知项目之前，应该先做什么？',options:['关闭证书校验让安装继续','把平台密钥发给维护者','核实来源、依赖和安装步骤'],correct:2,explanation:'来源、依赖和安装过程都属于信任链；不要关闭安全校验。',hint:'先理解即将运行什么，以及需要哪些权限。'},
-{id:'os-attribution',title:'尊重与署名',summary:'让你的作品保留正确来源。',objective:'建立可验证的署名与授权记录。',heading:'尊重也是工程能力',body:'复用代码、图片、字体和课程内容时，应分别核对许可。记录项目名、作者、版本、来源地址、许可证与修改说明。MIT 等许可证通常要求保留版权和许可声明。具体义务以实际许可证为准；本课不是法律意见。',example:'署名清单：项目名称 / 作者 / 来源 URL / 版本 / MIT 文本 / 修改说明。没有明确许可的图片不能因为在网上就自由使用。',question:'复用 MIT 代码时，哪种行为更合适？',options:['保留所需版权与许可声明','删除原作者名字','认为所有网络图片也适用 MIT'],correct:0,explanation:'应保留实际许可证要求的声明，分别核实其他资产的许可。',hint:'记录来源并遵守该份许可证的条款。'}
+import { z } from "zod";
+const lessonSchema = z.object({
+  id: z.string(),
+  moduleId: z.literal("os-m01"),
+  title: z.string(),
+  locale: z.literal("zh-Hans"),
+  summary: z.string(),
+  objectives: z.array(z.string()),
+  prerequisites: z.array(z.string()),
+  estimatedMinutes: z.number(),
+  segments: z.array(z.object({ heading: z.string(), body: z.string() })),
+  example: z.string(),
+  question: z.string(),
+  options: z.array(z.string()).length(3),
+  correct: z.number().int().min(0).max(2),
+  explanation: z.string(),
+  hints: z.array(z.string()),
+  evidenceRequirements: z.array(z.string()),
+  references: z.array(z.object({ title: z.string(), url: z.url() })),
+  reviewedAt: z.null(),
+  version: z.literal(1),
+});
+const seeds = [
+  {
+    id: "os-source",
+    title: "什么是源代码？",
+    summary: "看见软件背后可读的指令。",
+    objective: "区分源代码、运行结果与文档。",
+    heading: "食谱与成品",
+    body: "源代码像食谱：用程序语言写下每一步指令。运行程序像照着食谱做饭，屏幕上的结果像成品。README 是使用说明，不等于所有源代码。阅读代码可以帮助理解行为；运行陌生代码前仍需要检查来源和权限。",
+    example:
+      'print("你好，世界") 是 Python 源代码。屏幕显示的「你好，世界」是运行结果。',
+    question: "下面哪一个是源代码？",
+    options: ["屏幕上的欢迎图片", 'print("你好") 这条指令', "应用商店的评分"],
+    correct: 1,
+    explanation: "源代码是开发者可阅读和修改的指令；图片和评分是输出或元数据。",
+    hint: "寻找描述「该做什么」的指令，而不是已经显示出来的结果。",
+  },
+  {
+    id: "os-permissions",
+    title: "免费、开源与可见源码",
+    summary: "价格不决定你可以怎样使用代码。",
+    objective: "用授权条款判断开放程度。",
+    heading: "看得见，不等于有许可",
+    body: "免费只描述价格。开源要求许可证授予使用、研究、修改和再分发等权利，并满足 Open Source Definition。Source-available 表示源码可见，却可能禁止商业使用或限制用途。公开仓库没有许可证时，不应假设拥有修改和分发权。",
+    example:
+      "一个免费应用可以完全闭源；一个 MIT 项目可以收费销售，但要遵守许可证的声明保留要求。",
+    question: "公开仓库没有 LICENSE，应该怎么做？",
+    options: [
+      "直接复制并发布",
+      "假设它属于公有领域",
+      "先确认授权，不推定可复用",
+    ],
+    correct: 2,
+    explanation: "公开可见不自动授予再分发权。应核实权利人与许可证。",
+    hint: "访问权限与法律授权是两件不同的事。",
+  },
+  {
+    id: "os-community",
+    title: "社区与维护者",
+    summary: "软件由人一起维护。",
+    objective: "选择尊重社区的提问方式。",
+    heading: "协作先从理解开始",
+    body: "维护者负责审查贡献、管理发布和项目方向。贡献者可以提交文档、翻译、问题报告或代码。先读 README、CONTRIBUTING 和行为准则；提问时提供重现步骤、预期与实际结果，不要求志愿者立即回复。",
+    example:
+      "问题报告：在版本 1.2 点击「保存」，预期保存文件，实际显示权限错误；附最小重现步骤，移除私人信息。",
+    question: "第一次报告问题，哪种做法最有帮助？",
+    options: [
+      "提供版本与最小重现步骤",
+      "重复发送「快点修」",
+      "公开粘贴账户密码",
+    ],
+    correct: 0,
+    explanation: "可重现的描述帮助维护者定位问题，也应避免泄露私人信息。",
+    hint: "让别人能够理解并复现同一个问题。",
+  },
+  {
+    id: "os-library",
+    title: "库与应用",
+    summary: "分清积木与完整作品。",
+    objective: "区分供开发者调用的库与直接使用的应用。",
+    heading: "可复用的积木",
+    body: "库为其他程序提供功能，例如日期计算、图表或界面组件。应用通常提供完整用户流程。一个项目可能同时提供命令行应用和库。判断时看它面向谁、如何安装和使用，而不是只看仓库名字。",
+    example:
+      "React 是构建界面的库；一个用 React 制作的学习网站是应用。两者都可以开源。",
+    question: "给其他程序提供日期计算函数的包，更接近什么？",
+    options: ["软件许可证", "代码库 Library", "用户评分"],
+    correct: 1,
+    explanation: "可供其他程序调用的功能集合属于库。",
+    hint: "它是给开发者使用的积木，还是直接完成用户任务的成品？",
+  },
+  {
+    id: "os-trust",
+    title: "信任与软件供应链",
+    summary: "开源可以检查，但不是自动安全。",
+    objective: "识别依赖安装前的必要检查。",
+    heading: "信任需要证据",
+    body: "软件供应链包括源码、维护者、依赖、构建工具与发布产物。星标多不等于安全。阅读安装命令、确认来源、锁定依赖、检查发布与审查记录。绝不在不了解用途时向陌生脚本交出管理员权限或密钥。",
+    example:
+      "看到 curl ... | sh，先检查下载地址和脚本内容、验证可信发布来源，再在隔离环境评估。此课程不会运行外部仓库。",
+    question: "安装未知项目之前，应该先做什么？",
+    options: [
+      "关闭证书校验让安装继续",
+      "把平台密钥发给维护者",
+      "核实来源、依赖和安装步骤",
+    ],
+    correct: 2,
+    explanation: "来源、依赖和安装过程都属于信任链；不要关闭安全校验。",
+    hint: "先理解即将运行什么，以及需要哪些权限。",
+  },
+  {
+    id: "os-attribution",
+    title: "尊重与署名",
+    summary: "让你的作品保留正确来源。",
+    objective: "建立可验证的署名与授权记录。",
+    heading: "尊重也是工程能力",
+    body: "复用代码、图片、字体和课程内容时，应分别核对许可。记录项目名、作者、版本、来源地址、许可证与修改说明。MIT 等许可证通常要求保留版权和许可声明。具体义务以实际许可证为准；本课不是法律意见。",
+    example:
+      "署名清单：项目名称 / 作者 / 来源 URL / 版本 / MIT 文本 / 修改说明。没有明确许可的图片不能因为在网上就自由使用。",
+    question: "复用 MIT 代码时，哪种行为更合适？",
+    options: [
+      "保留所需版权与许可声明",
+      "删除原作者名字",
+      "认为所有网络图片也适用 MIT",
+    ],
+    correct: 0,
+    explanation: "应保留实际许可证要求的声明，分别核实其他资产的许可。",
+    hint: "记录来源并遵守该份许可证的条款。",
+  },
 ];
-export const lessons=z.array(lessonSchema).parse(seeds.map(s=>({...s,moduleId:'os-m01',locale:'zh-Hans',objectives:[s.objective],prerequisites:[],estimatedMinutes:5,segments:[{heading:s.heading,body:s.body}],hints:[s.hint],evidenceRequirements:['正确回答本课检查题'],references:[{title:'Open Source Definition',url:'https://opensource.org/osd'},{title:'GitHub licensing guidance',url:'https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository'}],reviewedAt:null,version:1})));
+export const lessons = z.array(lessonSchema).parse(
+  seeds.map((s) => ({
+    ...s,
+    moduleId: "os-m01",
+    locale: "zh-Hans",
+    objectives: [s.objective],
+    prerequisites: [],
+    estimatedMinutes: 5,
+    segments: [{ heading: s.heading, body: s.body }],
+    hints: [s.hint],
+    evidenceRequirements: ["正确回答本课检查题"],
+    references: [
+      { title: "Open Source Definition", url: "https://opensource.org/osd" },
+      {
+        title: "GitHub licensing guidance",
+        url: "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository",
+      },
+    ],
+    reviewedAt: null,
+    version: 1,
+  })),
+);
