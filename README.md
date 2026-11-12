@@ -34,3 +34,7 @@ See `docs/CURRENT_STATUS.md` for verified scope and limitations. Product specifi
 ## Open Source M01
 
 Start at `/learn/opensource/foundations`. Six lessons at `/lesson/:lessonId` contain real authored explanations and quizzes. Correct answers persist progress locally. `/learn/opensource/assessment` creates a license-classification worksheet shown in Projects. Lessons can be revisited freely. Content lives in `content/opensource.ts` and is validated with Zod. Nothing connects to or executes an external repository.
+
+## Interactive labs
+
+`/lab/git`: create a feature branch, edit README to contain `Hello open source`, stage, commit, and check. Staging captures a snapshot; later edits are not silently committed. `/lab/logic`: select AND/OR/XOR/NOT, toggle inputs, predict the truth table and check. Both support undo/reset and save successful evidence locally. These are labeled simulations, never real Git or hardware execution.
