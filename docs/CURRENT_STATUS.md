@@ -199,3 +199,9 @@ Phase 5A、5B、5C、5D 本轮开发范围已实现，待 PR 审查；不表示�
 最后 fetch 的 origin/main 为 fb28a6f5f3a6949ac7408489ca7bd56e7c607d83，已包含于开发分支历史。Git fetch 可用，GitHub API 仍返回 Forbidden；PR 与推送结果以最后发布记录为准。网络草案尚不能视为已应用配置，不宣称已创建 PR 或部署成功。
 
 最终安全检查：Gitleaks 对全部 14 个既有提交、待提交索引快照及最终完整应用产物进行脱敏扫描，均未发现泄露。Pages 验证后重新执行普通 pnpm build 成功，本机 dist 恢复完整应用模式；扫描工具/报告与构建产物均不提交。
+
+### 分支发布结果
+
+Phase 5A abd1d3f、5B 3446f23、5C e9b554c、5D 7c045da 已按顺序提交。Git push 成功，远端 feature/phase5-curriculum 已验证包含 7c045daeb26e2e7dfdb50bdca1630f7759fac3fc；main 仍为 fb28a6f5f3a6949ac7408489ca7bd56e7c607d83，没有直接合并或覆盖。
+
+实际执行 gh pr create 时，POST https://api.github.com/graphql 返回 Forbidden，因此本轮尚未创建 PR。可在 https://github.com/OsscarSon/nexus-lab/pull/new/feature/phase5-curriculum 人工建立 main ← feature/phase5-curriculum 的 PR，或应用环境中 api.github.com 网络配置后重试。不要将该创建页面称为已存在 PR。未验证远端 Actions/Pages 部署，不能宣称线上 Phase 5 已发布。
