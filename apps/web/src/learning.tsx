@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { Link, NavLink, useParams, useSearchParams } from "react-router-dom";
 import {
   WorkspacePanels,
   PageIntro,
@@ -6,102 +8,230 @@ import {
 } from "./components/ui";
 import { Icon } from "./components/icon";
 import { Mentor } from "./mentor";
-import { useState } from "react";
-import { Link, NavLink, useParams } from "react-router-dom";
-import { lessons } from "../../../content/opensource";
+import { curriculum } from "../../../content/curriculum";
 import {
-  complete,
-  parseProgress,
-  grade,
-} from "../../../packages/lesson-engine";
-import { read, write } from "./storage";
+  ref,
+  type Lesson as LessonContent,
+} from "../../../packages/curriculum/schema";
+import { grade } from "../../../packages/lesson-engine";
+import {
+  completedKeys,
+  courseProgress,
+  gradeLesson,
+} from "../../../packages/curriculum/evidence";
+import { write } from "./storage";
+import {
+  readCurriculumProgress,
+  saveEvidence,
+  migrateLearningData,
+  compatibleProgress,
+} from "./curriculum-storage";
+import { InteractiveBlock } from "./interactions";
 export function getProgress() {
-  const p = parseProgress(read("nexus-progress", null));
-  return {
-    ...p,
-    completed: p.completed.filter((id) => lessons.some((l) => l.id === id)),
-  };
+  return compatibleProgress();
 }
 export function Course() {
-  const p = getProgress();
+  const { courseId } = useParams();
+  const course = curriculum.get(
+    "course",
+    courseId || "course.opensource-literacy",
+  );
+  if (!course || course.status !== "available")
+    return (
+      <>
+        <h1>课程尚未开放或不存在</h1>
+        <Link to="/learn">查看已发布课程</Link>
+      </>
+    );
+  const ledger = readCurriculumProgress();
+  const lessons = curriculum.lessons(ref("course", course.id));
+  const progress = courseProgress(ref("course", course.id), ledger, curriculum);
+  const academy = curriculum
+    .list("path")
+    .find((p) => p.courseRefs.some((c) => c.id === course.id))?.academyRefs[0];
   return (
     <section className="course-overview prose">
-      <Link className="back-link" to="/learn/opensource">
-        ← 开源学院
+      <Link
+        className="back-link"
+        to={academy ? "/learn/" + academy.id : "/learn"}
+      >
+        ← {academy ? curriculum.get("academy", academy.id)?.title : "学院目录"}
       </Link>
       <PageIntro
-        eyebrow="M01 · OPEN SOURCE LITERACY"
-        title="读懂开源，从这里开始。"
+        eyebrow="SHARED CURRICULUM · V1"
+        title={
+          course.id === "course.opensource-literacy"
+            ? "读懂开源，从这里开始。"
+            : course.title
+        }
       >
-        6 节短课 · 约 30 分钟 · 无需账户 · 零基础
+        {course.description}
       </PageIntro>
       <div className="course-outcomes card">
         <Badge>课程可学习</Badge>
-        <h2>理解权限、社区与可信的软件来源</h2>
-        <p>
-          按课学习，完成检查题，再用决策工作表展示你的判断。课时可自由回顾，不锁定线性进度。
+        <h2>这一次，你会学到</h2>
+        <ul className="objectives">
+          {course.outcomes.map((o) => (
+            <li key={o}>
+              <Icon name="check" size={18} />
+              {o}
+            </li>
+          ))}
+        </ul>
+        <p className="fine">
+          共享课时通过一次即可抵扣兼容路径；不同项目的独立要求分别验证。
         </p>
       </div>
       <ProgressBar
         label="课程完成进度"
-        value={p.completed.length}
-        total={lessons.length}
+        value={progress.completed}
+        total={progress.total}
       />
-      {lessons.map((l, i) => (
-        <Link className="card choice" key={l.id} to={"/lesson/" + l.id}>
+      {lessons.map((lesson, i) => (
+        <Link
+          className="card choice"
+          key={lesson.id}
+          to={"/lesson/" + lesson.id + "?course=" + course.id}
+        >
           <span>
-            {p.completed.includes(l.id) ? "✓" : String(i + 1).padStart(2, "0")}
+            {ledger.evidence.some(
+              (e) =>
+                e.kind === "lesson" &&
+                e.id === lesson.id &&
+                e.version === lesson.version,
+            )
+              ? "✓"
+              : String(i + 1).padStart(2, "0")}
           </span>
           <div>
-            <strong>{l.title}</strong>
-            <p>{l.summary}</p>
+            <strong>{lesson.title}</strong>
+            <p>{lesson.summary}</p>
           </div>
           <Icon name="arrow" size={18} />
         </Link>
       ))}
-      <Link className="button" to="/learn/opensource/assessment">
-        完成模块检查 →
-      </Link>
+      {course.id === "course.opensource-literacy" && (
+        <Link className="button" to="/learn/opensource/assessment">
+          完成模块检查 →
+        </Link>
+      )}
+      {course.projectRefs.length > 0 && (
+        <details>
+          <summary>本课程作品要求</summary>
+          {course.projectRefs.map((r) => (
+            <p key={r.id}>{curriculum.get("project", r.id)?.description}</p>
+          ))}
+          <Link className="text-link" to="/projects">
+            查看已有作品与证据 →
+          </Link>
+        </details>
+      )}
     </section>
   );
 }
 export function Lesson() {
   const { lessonId } = useParams();
-  const lesson = lessons.find((l) => l.id === lessonId);
-  if (!lesson)
+  const [params] = useSearchParams();
+  const lesson = curriculum.get("lesson", lessonId || "");
+  const requested = params.get("course");
+  const course =
+    (requested && curriculum.get("course", requested)) ||
+    curriculum
+      .list("course")
+      .find(
+        (c) =>
+          c.status === "available" &&
+          curriculum
+            .lessons(ref("course", c.id))
+            .some((l) => l.id === lessonId),
+      );
+  if (!lesson || lesson.status !== "available")
     return (
       <>
         <h1>课程不存在</h1>
-        <Link to="/learn/opensource/foundations">返回课程</Link>
+        <Link to="/learn">返回课程目录</Link>
       </>
     );
-  return <LessonBody key={lesson.id} lesson={lesson} />;
+  const context =
+    course &&
+    course.status === "available" &&
+    curriculum.lessons(ref("course", course.id)).some((l) => l.id === lesson.id)
+      ? course
+      : undefined;
+  return (
+    <LessonBody
+      key={lesson.id + "-" + context?.id}
+      lesson={lesson}
+      courseId={context?.id}
+    />
+  );
 }
-function LessonBody({ lesson: l }: { lesson: (typeof lessons)[number] }) {
-  const [answer, setAnswer] = useState(-1);
+function LessonBody({
+  lesson: l,
+  courseId,
+}: {
+  lesson: LessonContent;
+  courseId?: string;
+}) {
+  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [exercises, setExercises] = useState<Record<string, unknown>>({});
   const [feedback, setFeedback] = useState("");
   const [passed, setPassed] = useState(false);
   const [hint, setHint] = useState(false);
   const [panel, setPanel] = useState("learn");
-  const index = lessons.findIndex((x) => x.id === l.id);
-  const next = lessons[index + 1];
+  const [storageWarning, setStorageWarning] = useState("");
+  useEffect(() => {
+    if (!migrateLearningData())
+      setStorageWarning(
+        "当前存储不可用，旧记录保持原样，本次学习可能无法保存。",
+      );
+  }, []);
+  const ledger = readCurriculumProgress();
   const p = getProgress();
+  const course = courseId && curriculum.get("course", courseId);
+  const lessons = course ? curriculum.lessons(ref("course", course.id)) : [l];
+  const index = lessons.findIndex((x) => x.id === l.id);
+  const next =
+    lessons[index + 1] ||
+    l.nextRefs
+      .map((r) =>
+        r.kind === "lesson" ? curriculum.get("lesson", r.id) : undefined,
+      )
+      .find((x) => x?.status === "available");
+  const prerequisites = curriculum.prerequisites(
+    ref("lesson", l.id),
+    completedKeys(ledger, curriculum),
+  );
+  const blocked = prerequisites.some(
+    (d) => d.kind === "required" && !d.satisfied,
+  );
+  const assessments = l.assessmentRefs.map(
+    (r) => curriculum.get("assessment", r.id)!,
+  );
+  const legacy = l.legacyCompatible;
   function check() {
-    if (answer !== l.correct) {
-      setFeedback("再想一想。" + l.hints[0]);
+    if (blocked) {
+      setFeedback("先完成列出的必需先修，再保存本课证据。");
+      setPassed(false);
+    } else if (!gradeLesson(l, { exercise: exercises, answers }, curriculum)) {
+      setFeedback(
+        "再想一想。" +
+          l.hints[0] +
+          (l.requiresExercise ? " 请先通过互动练习，再完成检查题。" : ""),
+      );
       setPassed(false);
     } else {
-      const saved = write(
-        "nexus-progress",
-        complete(
-          getProgress(),
-          l.id,
-          lessons.map((x) => x.id),
-        ),
-      );
+      const saved = saveEvidence({
+        kind: "lesson",
+        id: l.id,
+        version: l.version,
+        completedAt: new Date().toISOString(),
+        source: "assessment",
+        proof: { exercise: exercises, answers },
+      });
       setPassed(true);
       setFeedback(
-        l.explanation +
+        assessments.map((a) => a.explanation).join(" ") +
           (saved
             ? " 已保存学习进度。"
             : " 本题通过，但存储不可用，进度未保存。"),
@@ -113,28 +243,47 @@ function LessonBody({ lesson: l }: { lesson: (typeof lessons)[number] }) {
     <div className="lesson-layout">
       <div className="outline">
         <details>
-          <summary>课程目录 · 6 节</summary>
+          <summary>课程目录 · {lessons.length} 节</summary>
           {lessons.map((x, i) => (
-            <NavLink key={x.id} to={"/lesson/" + x.id}>
+            <NavLink
+              key={x.id}
+              to={"/lesson/" + x.id + (courseId ? "?course=" + courseId : "")}
+            >
               {p.completed.includes(x.id) ? "✓" : i + 1}. {x.title}
             </NavLink>
           ))}
         </details>
-        <div className="outline-progress">
-          <ProgressBar
-            label="开源素养 M01"
-            value={p.completed.length}
-            total={lessons.length}
-          />
-          <p className="fine">按你的节奏，可以随时回顾。</p>
-        </div>
+        {course && (
+          <div className="outline-progress">
+            <ProgressBar
+              label={course.title}
+              value={
+                courseProgress(ref("course", course.id), ledger, curriculum)
+                  .completed
+              }
+              total={lessons.length}
+            />
+            <p className="fine">同一课时在其他路径也可复用。</p>
+          </div>
+        )}
       </div>
       <article className="lesson">
-        <Link className="back-link" to="/learn/opensource/foundations">
+        <Link
+          className="back-link"
+          to={
+            course
+              ? course.id === "course.opensource-literacy"
+                ? "/learn/opensource/foundations"
+                : "/course/" + course.id
+              : "/learn"
+          }
+        >
           ← 课程概览
         </Link>
         <div className="row">
-          <Badge>第 {index + 1} / 6 课</Badge>
+          <Badge>
+            第 {index + 1} / {lessons.length} 课
+          </Badge>
           <span className="fine">
             {l.estimatedMinutes} 分钟 ·{" "}
             {p.completed.includes(l.id) ? "已完成，可回顾" : "尚未通过检查"}
@@ -145,6 +294,28 @@ function LessonBody({ lesson: l }: { lesson: (typeof lessons)[number] }) {
           <Icon name="compass" size={20} />
           <p>学习目标：{l.objectives.join("；")}</p>
         </div>
+        {storageWarning && <p role="alert">{storageWarning}</p>}
+        {prerequisites.length > 0 && (
+          <details>
+            <summary>先修与相关主题</summary>
+            {prerequisites.map((d) => (
+              <p key={d.kind + d.to.id}>
+                {d.kind === "required"
+                  ? "必需"
+                  : d.kind === "recommended"
+                    ? "建议"
+                    : "相关"}
+                ：{d.title} · {d.rationale} ·{" "}
+                {d.satisfied ? "已有兼容证据" : "尚未完成"}
+                {d.to.kind === "lesson" && (
+                  <Link className="text-link" to={"/lesson/" + d.to.id}>
+                    查看先修课时 →
+                  </Link>
+                )}
+              </p>
+            ))}
+          </details>
+        )}
         <WorkspacePanels
           active={panel}
           onSelect={setPanel}
@@ -156,17 +327,25 @@ function LessonBody({ lesson: l }: { lesson: (typeof lessons)[number] }) {
               children: (
                 <>
                   <span className="eyebrow">UNDERSTAND THE IDEA</span>
-                  {l.segments.map((seg) => (
-                    <section key={seg.heading}>
-                      <h2>{seg.heading}</h2>
-                      <p>{seg.body}</p>
+                  {l.segments.map((s) => (
+                    <section key={s.heading}>
+                      <h2>{s.heading}</h2>
+                      <p>{s.body}</p>
                     </section>
                   ))}
                   <div className="example-card">
                     <span className="eyebrow">GUIDED EXAMPLE</span>
                     <p>{l.example}</p>
                   </div>
-                  {l.id === "os-source" && <RepositoryDemo />}
+                  {l.blocks
+                    .filter((b) => b.kind === "repository")
+                    .map((b) => (
+                      <InteractiveBlock
+                        block={b}
+                        key={b.id}
+                        onEvidence={() => undefined}
+                      />
+                    ))}
                   <button
                     className="secondary mobile-panel-action"
                     onClick={() => setPanel("practice")}
@@ -182,38 +361,58 @@ function LessonBody({ lesson: l }: { lesson: (typeof lessons)[number] }) {
               label: "练习",
               children: (
                 <>
-                  <span className="eyebrow">CHECK YOUR UNDERSTANDING</span>
-                  <fieldset className="answers">
-                    <legend>{l.question}</legend>
-                    {l.options.map((o, i) => (
-                      <label key={o}>
-                        <input
-                          type="radio"
-                          name="answer"
-                          checked={answer === i}
-                          onChange={() => {
-                            setAnswer(i);
-                            setFeedback("");
-                            setPassed(false);
-                          }}
-                        />
-                        {o}
-                      </label>
+                  <span className="eyebrow">TRY & CHECK</span>
+                  {l.blocks
+                    .filter((b) => b.kind !== "repository")
+                    .map((b) => (
+                      <InteractiveBlock
+                        key={b.id}
+                        block={b}
+                        onEvidence={(value) => {
+                          setExercises({ ...exercises, [b.id]: value });
+                          setFeedback("");
+                          setPassed(false);
+                        }}
+                      />
                     ))}
-                    <div className="practice-actions">
-                      <button disabled={answer < 0} onClick={check}>
-                        <Icon name="check" size={18} />
-                        检查答案
-                      </button>
-                      <button
-                        className="secondary"
-                        onClick={() => setHint(!hint)}
-                      >
-                        {hint ? "收起提示" : "给我一个提示"}
-                      </button>
-                    </div>
-                    {hint && <p className="hint-text">{l.hints[0]}</p>}
-                  </fieldset>
+                  {assessments.map((a) => (
+                    <fieldset className="answers" key={a.id}>
+                      <legend>{a.question}</legend>
+                      {a.options.map((o, i) => (
+                        <label key={o}>
+                          <input
+                            type="radio"
+                            name={a.id}
+                            checked={answers[a.id] === i}
+                            onChange={() => {
+                              setAnswers({ ...answers, [a.id]: i });
+                              setFeedback("");
+                              setPassed(false);
+                            }}
+                          />
+                          {o}
+                        </label>
+                      ))}
+                    </fieldset>
+                  ))}
+                  <div className="practice-actions">
+                    <button
+                      disabled={assessments.some(
+                        (a) => answers[a.id] === undefined,
+                      )}
+                      onClick={check}
+                    >
+                      <Icon name="check" size={18} />
+                      检查答案
+                    </button>
+                    <button
+                      className="secondary"
+                      onClick={() => setHint(!hint)}
+                    >
+                      {hint ? "收起提示" : "给我一个提示"}
+                    </button>
+                  </div>
+                  {hint && <p className="hint-text">{l.hints[0]}</p>}
                 </>
               ),
             },
@@ -233,18 +432,35 @@ function LessonBody({ lesson: l }: { lesson: (typeof lessons)[number] }) {
                       完成检查后，这里会显示具体反馈。回答错误也可以继续尝试。
                     </p>
                   )}
-                  {passed && (
-                    <Link
-                      className="button"
-                      to={
-                        next
-                          ? "/lesson/" + next.id
-                          : "/learn/opensource/assessment"
-                      }
-                    >
-                      {next ? "下一课 →" : "进入模块检查 →"}
-                    </Link>
-                  )}
+                  {passed &&
+                    (next ? (
+                      <Link
+                        className="button"
+                        to={
+                          "/lesson/" +
+                          next.id +
+                          (courseId && lessons.some((x) => x.id === next.id)
+                            ? "?course=" + courseId
+                            : "")
+                        }
+                      >
+                        下一课 →
+                      </Link>
+                    ) : legacy ? (
+                      <Link
+                        className="button"
+                        to="/learn/opensource/assessment"
+                      >
+                        进入模块检查 →
+                      </Link>
+                    ) : (
+                      <Link
+                        className="button"
+                        to={course ? "/course/" + course.id : "/learn"}
+                      >
+                        返回课程与成果 →
+                      </Link>
+                    ))}
                   {feedback && !passed && (
                     <button
                       className="secondary mobile-panel-action"
@@ -271,34 +487,6 @@ function LessonBody({ lesson: l }: { lesson: (typeof lessons)[number] }) {
           ))}
         </details>
       </article>
-    </div>
-  );
-}
-function RepositoryDemo() {
-  const [file, setFile] = useState("README.md");
-  const files: Record<string, string> = {
-    "README.md": "# Hello Project\n使用说明：运行 hello.py，显示欢迎信息。",
-    "hello.py": 'print("你好，开源世界")',
-    LICENSE: "示例许可证占位说明：真实项目需要检查完整的授权条款。",
-  };
-  return (
-    <div className="card">
-      <h3>仓库探索 · 离线教学示例</h3>
-      <p>点击文件，区分使用说明、源代码与许可。</p>
-      <div className="row">
-        {Object.keys(files).map((f) => (
-          <button
-            className="secondary"
-            key={f}
-            onClick={() => setFile(f)}
-            aria-pressed={file === f}
-          >
-            {f}
-          </button>
-        ))}
-      </div>
-      <pre>{files[file]}</pre>
-      <p>此示例不连接 GitHub，也不运行代码。</p>
     </div>
   );
 }

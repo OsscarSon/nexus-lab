@@ -1,10 +1,12 @@
-import { lessons } from "../../content/opensource";
+import { curriculum } from "../../content/curriculum";
 import type { MentorRequest, MentorResponse } from "./contracts";
 export function fallback(
   request: MentorRequest,
   reason = "ai-disabled",
 ): MentorResponse {
-  const lesson = lessons.find((l) => l.id === request.lessonId);
+  const lesson = request.lessonId
+    ? curriculum.get("lesson", request.lessonId)
+    : undefined;
   const answers = {
     explain:
       lesson?.segments[0].body ||

@@ -307,3 +307,65 @@ it("records over-budget provider metering and fails closed on subsequent calls",
     "provider-metering-unavailable",
   );
 });
+
+it("safely upgrades legacy SQLite rows with a byte-preserving backup and supports both protocols", async () => {
+  const s = store();
+  const { call } = await listen(s);
+  const cookie = await register(call);
+  const id = (
+    s.db.prepare("SELECT id FROM users WHERE username=?").get("learner") as {
+      id: string;
+    }
+  ).id;
+  const original = JSON.stringify({
+    version: 1,
+    completed: ["os-source", "unknown-historical-id"],
+    custom: "retain this",
+  });
+  s.db.prepare("INSERT INTO progress VALUES(?,?)").run(id, original);
+  const before = await (
+    await call("/api/progress/v2", "GET", undefined, cookie)
+  ).json();
+  expect(
+    before.progress.evidence.some((e: { id: string }) => e.id === "os-source"),
+  ).toBe(true);
+  expect(JSON.stringify(before.progress.unresolved)).toContain(
+    "unknown-historical-id",
+  );
+  expect(
+    (await call("/api/progress/v2", "POST", before.progress, cookie)).status,
+  ).toBe(200);
+  expect(
+    (
+      s.db
+        .prepare("SELECT data FROM progress_backups WHERE user_id=?")
+        .get(id) as { data: string }
+    ).data,
+  ).toBe(original);
+  const legacy = await (
+    await call("/api/progress", "GET", undefined, cookie)
+  ).json();
+  expect(legacy.progress.version).toBe(1);
+  expect(legacy.progress.completed).toContain("os-source");
+  const broken = {
+    version: 2,
+    evidence: [
+      {
+        kind: "lesson",
+        id: "os-source",
+        version: 99,
+        completedAt: null,
+        source: "assessment",
+        proof: {},
+      },
+    ],
+    unresolved: [],
+  };
+  expect((await call("/api/progress/v2", "POST", broken, cookie)).status).toBe(
+    400,
+  );
+  await call("/api/account", "DELETE", {}, cookie);
+  expect(
+    s.db.prepare("SELECT data FROM progress_backups WHERE user_id=?").get(id),
+  ).toBeUndefined();
+});

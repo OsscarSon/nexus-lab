@@ -1,4 +1,4 @@
-import { lessons } from "../../content/opensource";
+import { curriculum } from "../../content/curriculum";
 import {
   redact,
   type MentorRequest,
@@ -22,7 +22,9 @@ export async function mentor(
 ): Promise<MentorResponse> {
   if (!config.enabled || !config.provider) return fallback(request);
   if (!userId) return fallback(request, "sign-in-required");
-  const lesson = lessons.find((l) => l.id === request.lessonId);
+  const lesson = request.lessonId
+    ? curriculum.get("lesson", request.lessonId)
+    : undefined;
   const policies = {
     explain: "先给具体类比，再给准确解释。",
     hint: "一次只给一个提示，不直接给完整答案，除非用户明确要求。",

@@ -87,10 +87,10 @@ function Landing() {
   );
 }
 function VisitObserver() {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   React.useEffect(() => {
-    recordVisit(pathname);
-  }, [pathname]);
+    recordVisit(pathname + search);
+  }, [pathname, search]);
   return null;
 }
 function Breadcrumb() {
@@ -214,6 +214,7 @@ function App() {
                 element={<Assessment />}
               />
               <Route path="/lesson/:lessonId" element={<Lesson />} />
+              <Route path="/course/:courseId" element={<Course />} />
               <Route path="/lab" element={<LabDirectory />} />
               <Route path="/lab/:labId" element={<LabRoute />} />
               <Route path="/opensource/git-playground" element={<LabRoute />} />

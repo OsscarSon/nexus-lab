@@ -714,7 +714,11 @@ export function Projects() {
   const results = artifacts.filter(
     (a) =>
       filter === "all" ||
-      (filter === "lab" ? a.kind !== "worksheet" : a.kind === "worksheet"),
+      (filter === "lab"
+        ? a.kind === "lab" || a.kind === "python"
+        : filter === "course"
+          ? a.kind === "curriculum"
+          : a.kind === "worksheet"),
   );
   return (
     <>
@@ -730,6 +734,7 @@ export function Projects() {
             ["all", "全部成果"],
             ["lab", "实验与 Python"],
             ["worksheet", "学习工作表"],
+            ["course", "课程成果"],
           ].map(([id, label]) => (
             <button
               className="filter-button"

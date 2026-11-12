@@ -49,9 +49,9 @@ export const interactionSchema = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("prompt"),
     id,
-    task: z.string(),
-    audience: z.string(),
-    constraint: z.string(),
+    task: z.string().min(1),
+    audience: z.string().min(1),
+    constraint: z.string().min(1),
   }),
   z.object({
     kind: z.literal("game"),
@@ -72,7 +72,7 @@ export const interactionSchema = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("permissions"),
     id,
-    options: z.array(z.string()).min(2),
+    options: z.array(z.string().min(1)).min(2),
     expected: z.array(z.string()).min(1),
   }),
   z.object({
@@ -83,6 +83,7 @@ export const interactionSchema = z.discriminatedUnion("kind", [
   }),
   z.object({
     kind: z.literal("classification"),
+    instructions: z.string().min(1),
     id,
     claims: z
       .array(z.object({ text: z.string(), category: z.string() }))
@@ -112,6 +113,7 @@ export const lessonSchema = z
     assessmentRefs: refs("assessment"),
     blocks: z.array(interactionSchema),
     requiresExercise: z.boolean(),
+    legacyCompatible: z.boolean().default(false),
     hints: z.array(z.string()).min(1),
     references: z.array(z.object({ title: z.string(), url: z.url() })),
     nextRefs: z.array(refSchema),
@@ -121,10 +123,10 @@ export const assessmentSchema = z
   .object({
     ...base,
     kind: z.literal("assessment"),
-    question: z.string(),
-    options: z.array(z.string()).min(2),
+    question: z.string().min(1),
+    options: z.array(z.string().min(1)).min(2),
     correct: z.number().int().nonnegative(),
-    explanation: z.string(),
+    explanation: z.string().min(1),
   })
   .strict()
   .refine(
@@ -183,6 +185,7 @@ export const entitySchema = z.discriminatedUnion("kind", [
     kind: z.literal("lab"),
     labId: z.enum(["git", "logic", "python", "spreadsheet"]),
     sampleId: z.enum(["variables", "loops", "functions"]).optional(),
+    expectedOutput: z.string().optional(),
     route: z.string().regex(/^\/lab\/(git|logic|python|spreadsheet)$/),
     runtime: z.enum(["simulation", "python", "formula"]),
   }),

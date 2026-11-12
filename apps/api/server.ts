@@ -14,7 +14,15 @@ import { readFile, mkdir } from "node:fs/promises";
 import { resolve, extname, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { z } from "zod";
-import { lessons } from "../../content/opensource";
+import { curriculum } from "../../content/curriculum";
+import { ref } from "../../packages/curriculum/schema";
+import {
+  ledgerSchema,
+  validateEvidence,
+  importLegacyProgress,
+  legacyProjection,
+} from "../../packages/curriculum/evidence";
+import { serverProgress, persistProgress } from "./progress";
 import { progressSchema } from "../../packages/lesson-engine";
 import { mentorRequestSchema } from "../../packages/ai-gateway/contracts";
 import { OpenAICompatibleProvider } from "../../packages/ai-gateway/provider";
@@ -36,12 +44,12 @@ class HttpError extends Error {
     super(message);
   }
 }
-async function body(req: IncomingMessage) {
+async function body(req: IncomingMessage, maxBytes = 12000) {
   const chunks: Buffer[] = [];
   let length = 0;
   for await (const chunk of req) {
     length += chunk.length;
-    if (length > 12000) throw new HttpError(413, "请求过大");
+    if (length > maxBytes) throw new HttpError(413, "请求过大");
     chunks.push(chunk);
   }
   try {
@@ -200,7 +208,7 @@ export function createApp(
         const id = requireUser();
         store.db.exec("BEGIN IMMEDIATE");
         try {
-          for (const table of ["sessions", "progress"])
+          for (const table of ["sessions", "progress", "progress_backups"])
             store.db.prepare(`DELETE FROM ${table} WHERE user_id=?`).run(id);
           store.db
             .prepare(
@@ -224,13 +232,57 @@ export function createApp(
         json(200, { ok: true });
         return;
       }
-      if (path === "/api/progress" && req.method === "GET") {
-        const row = store.db
-          .prepare("SELECT data FROM progress WHERE user_id=?")
-          .get(requireUser()) as { data: string } | undefined;
+      if (path === "/api/curriculum" && req.method === "GET") {
+        json(200, { catalog: curriculum.catalog });
+        return;
+      }
+      if (path.startsWith("/api/lesson/") && req.method === "GET") {
+        const lesson = curriculum.get(
+          "lesson",
+          path.slice("/api/lesson/".length),
+        );
+        if (!lesson || lesson.status !== "available")
+          throw new HttpError(404, "课时不存在或未发布");
+        json(200, { lesson });
+        return;
+      }
+      if (path.startsWith("/api/course/") && req.method === "GET") {
+        const course = curriculum.get(
+          "course",
+          path.slice("/api/course/".length),
+        );
+        if (!course || course.status !== "available")
+          throw new HttpError(404, "课程不存在或未发布");
         json(200, {
-          progress: row ? JSON.parse(row.data) : { version: 1, completed: [] },
+          course,
+          lessons: curriculum.lessons(ref("course", course.id)),
         });
+        return;
+      }
+      if (path === "/api/progress/v2" && req.method === "GET") {
+        json(200, { progress: serverProgress(store, requireUser()) });
+        return;
+      }
+      if (path === "/api/progress/v2" && req.method === "POST") {
+        const id = requireUser();
+        const parsed = ledgerSchema.safeParse(await body(req, 128000));
+        if (
+          !parsed.success ||
+          parsed.data.evidence.some((e) => !validateEvidence(e, curriculum))
+        )
+          throw new HttpError(400, "证据未通过课程/版本/量规检查");
+        json(200, { progress: persistProgress(store, id, parsed.data) });
+        return;
+      }
+      if (path === "/api/progress" && req.method === "GET") {
+        const progress = legacyProjection(
+          serverProgress(store, requireUser()),
+          curriculum,
+        );
+        progress.completed = progress.completed.filter(
+          (id) => curriculum.get("lesson", id)?.legacyCompatible,
+        );
+        json(200, { progress });
         return;
       }
       if (path === "/api/progress" && req.method === "POST") {
@@ -238,27 +290,21 @@ export function createApp(
         const parsed = progressSchema.strict().safeParse(await body(req));
         if (
           !parsed.success ||
-          parsed.data.completed.some((x) => !lessons.some((l) => l.id === x)) ||
-          parsed.data.completed.length > lessons.length
+          parsed.data.completed.some(
+            (id) => !curriculum.get("lesson", id)?.legacyCompatible,
+          )
         )
-          throw new HttpError(400, "无效课程进度");
-        const current = store.db
-          .prepare("SELECT data FROM progress WHERE user_id=?")
-          .get(id) as { data: string } | undefined;
-        const previous = current
-          ? progressSchema.parse(JSON.parse(current.data))
-          : { completed: [] };
-        const data = {
-          ...parsed.data,
-          completed: [
-            ...new Set([...previous.completed, ...parsed.data.completed]),
-          ],
-          updatedAt: new Date().toISOString(),
-        };
-        store.db
-          .prepare("INSERT OR REPLACE INTO progress VALUES(?,?)")
-          .run(id, JSON.stringify(data));
-        json(200, { progress: data });
+          throw new HttpError(400, "旧协议只接受原有课时，请使用 v2 证据同步");
+        const merged = persistProgress(
+          store,
+          id,
+          importLegacyProgress(parsed.data, curriculum),
+        );
+        const progress = legacyProjection(merged, curriculum);
+        progress.completed = progress.completed.filter(
+          (id) => curriculum.get("lesson", id)?.legacyCompatible,
+        );
+        json(200, { progress });
         return;
       }
       if (path === "/api/mentor/usage" && req.method === "GET") {
@@ -277,7 +323,7 @@ export function createApp(
         if (!parsed.success) throw new HttpError(400, "请求格式或长度无效");
         if (
           parsed.data.lessonId &&
-          !lessons.some((l) => l.id === parsed.data.lessonId)
+          curriculum.get("lesson", parsed.data.lessonId)?.status !== "available"
         )
           throw new HttpError(400, "未知课程上下文");
         if (!store.rate("chat-ip:" + ip, 20, 60000))

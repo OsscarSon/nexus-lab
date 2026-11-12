@@ -1,5 +1,6 @@
 import { academies } from "./catalog";
-import { academyPlans } from "./experience";
+import { pythonSamples } from "./python";
+import { academyPlans } from "./academy-plans";
 import { lessons as legacyLessons } from "./opensource";
 import { ref, type Catalog } from "../packages/curriculum/schema";
 import { CurriculumRegistry } from "../packages/curriculum/registry";
@@ -73,7 +74,14 @@ export function baseCatalog(): Catalog {
   ] as const)
     add("lab", id, title, {
       labId,
-      ...(sampleId ? { sampleId } : {}),
+      ...(sampleId
+        ? {
+            sampleId,
+            expectedOutput: pythonSamples.find(
+              (sample) => sample.id === sampleId,
+            )!.expected,
+          }
+        : {}),
       runtime,
       route: "/lab/" + labId,
     });
@@ -116,6 +124,7 @@ export function baseCatalog(): Catalog {
           ? [{ kind: "repository", id: "block.repo-files" }]
           : [],
       requiresExercise: false,
+      legacyCompatible: true,
       hints: l.hints,
       references: l.references,
       nextRefs: [],

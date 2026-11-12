@@ -3,9 +3,14 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "./api";
 import { getProgress } from "./learning";
-import { write, read } from "./storage";
+import { read } from "./storage";
 import { academies } from "../../../content/catalog";
-import { parseProgress, type Progress } from "../../../packages/lesson-engine";
+import { type Ledger } from "../../../packages/curriculum/evidence";
+import {
+  readCurriculumProgress,
+  mergeRemoteProgress,
+} from "./curriculum-storage";
+import { legacyLessonIds } from "../../../content/curriculum";
 type User = { id: string; username: string };
 export function Account() {
   const [user, setUser] = useState<User | null>(null);
@@ -14,7 +19,9 @@ export function Account() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-  const [completed, setCompleted] = useState(getProgress().completed.length);
+  const [completed, setCompleted] = useState(
+    getProgress().completed.filter((id) => legacyLessonIds.includes(id)).length,
+  );
   useEffect(() => {
     if (STATIC_DEPLOYMENT) {
       setLoading(false);
@@ -49,7 +56,8 @@ export function Account() {
         <p>
           无需账户即可学习。本机偏好与学习记录保存在当前浏览器，清除浏览器数据会删除记录。
         </p>
-        <p>已完成 {completed} / 6 节开源课程</p>
+        <p>已完成 {getProgress().completed.length} 个共享课时</p>
+        {completed > 0 && <p>已完成 {completed} / 6 节开源课程</p>}
         <p>
           当前方向：
           {academies.find((a) => a.id === read("nexus-goal", ""))?.title ||
@@ -80,14 +88,17 @@ export function Account() {
               onClick={async () => {
                 setBusy(true);
                 try {
-                  const remote = await api<{ progress: Progress }>(
-                    "/api/progress",
+                  const remote = await api<{ progress: Ledger }>(
+                    "/api/progress/v2",
                     "POST",
-                    getProgress(),
+                    readCurriculumProgress(),
                   );
-                  const merged = parseProgress(remote.progress);
-                  const saved = write("nexus-progress", merged);
-                  setCompleted(merged.completed.length);
+                  const saved = mergeRemoteProgress(remote.progress);
+                  setCompleted(
+                    getProgress().completed.filter((id) =>
+                      legacyLessonIds.includes(id),
+                    ).length,
+                  );
                   setMessage(
                     saved
                       ? "同步成功，课程进度已合并。"
