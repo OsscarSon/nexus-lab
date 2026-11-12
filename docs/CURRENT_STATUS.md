@@ -164,3 +164,9 @@ Pages 代码和工作流准备就绪不代表线上部署成功。首次部署�
 按 GitHub Issue #1 与最新 ROADMAP 实施新的 Phase 5，历史 Open Source Explorer 定义不适用。从最新 origin/main 创建 feature/phase5-curriculum，并合入已验证 UI V2 两个提交，未改 main。十学院同级入口/全量引导/中立首页保留；呈现模型补齐 available / in-development / planned 三种发布状态，发布可用性与学习者完成记录分开，未发布项目不生成假开始操作。5B/5C/5D 尚待后续提交。GitHub API 暂因 Forbidden 阻塞 PR 创建；Git 与 Issue 网页可读，已保存仅增加 api.github.com 的网络草案，尚未应用。
 
 5A 验证：lint、typecheck、49 项 unit/API 测试、生产构建、14 项桌面/移动中立入口与 UI V2 回归通过。新增发布状态时发现旧测试仅区分两态的类型假设，已改为明确以 available 判断可执行路由并重新通过 typecheck/build。
+
+## Phase 5B — 共享课程注册表与依赖图
+
+新增 Zod 校验的 Academy、Topic、LearningPath、Course、Module、Lesson、Assessment、ProjectTemplate、Lab 和带确切版本的 ContentRef；内容身份为 kind/id，旧六课 os-* ID 与 M01 路由别名保持。新内容仅以引用复用。注册表拒绝重复 ID、悬空引用、错版本、required/recommended 循环（包括容器展开边）、空已发布课程以及不可完成的已发布硬依赖。related 链接不锁课，先修查询返回原因和已有证据满足情况；路径需求去重。
+
+5B 验证：typecheck、lint、60 项测试及生产构建通过。11 项图/模式测试覆盖失效条件与去重。本提交尚未替换运行时学习页面或迁移学习记录；5C 接入通用体验与兼容存储后，5D 再发布十学院新切片。
