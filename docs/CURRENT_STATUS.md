@@ -117,3 +117,9 @@ Deferred limitations: no BYOK/local generative model, streaming, password recove
 Gitleaks 使用经过官方发布校验和核验的版本扫描全部 8 个既有提交、最终待提交文件及 Pages 静态产物，三次扫描均未发现泄露。扫描工具和报告留在忽略的 .cache 中，不提交。GitHub API 读取曾返回 Forbidden，Git fetch 正常；不能据此假定 Git push 成功或失败。推送结果以真实 Git 操作及远端 SHA 为准。
 
 Pages 代码和工作流准备就绪不代表线上部署成功。首次部署可能需要在仓库 Settings → Pages 将 Source 设为 GitHub Actions，并允许 Actions 与 github-pages 环境。只有远端工作流成功及站点验证后才能宣称部署完成；最终 Git 推送与站点验证状态见本次发布报告。
+
+## UI V2 — 第一组模块检查点
+
+开发分支 `develop/ui-v2`。延续原薄荷/深绿视觉，新增统一 SVG 图标、十学院无默认选择的引导、同级可搜索目录与实际内容筛选、统一目标/初阶/进阶/高阶概览及课程说明。首页移除固定开源起点，根据真实历史/原进度/所选方向续学；无记录时显示中立起点。作品卡片、详情和主动 JSON 导出读取原有工作表、Git/逻辑门、公式、Python 证据，不写回或迁移原数据。新增独立本机访问历史键 `nexus-ui-history`，访问不等于完成。
+
+首组检查：typecheck、lint、47 项测试、生产构建、桌面/移动引导与七个代表页面 WCAG A/AA/无溢出检查通过。检查发现并修正了搜索框对比度与移动搜索图标可访问名称。课时/实验的响应式面板与完整回归仍在后续模块进行，不能将本检查点称为 UI V2 全部完成。详细设计见 UI_V2.md。
