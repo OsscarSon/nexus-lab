@@ -1,3 +1,4 @@
+import { choosePanel } from "../helpers/panels";
 import { test, expect } from "@playwright/test";
 test("runs real Pyodide in a worker and completes each micro lesson", async ({
   page,
@@ -18,6 +19,7 @@ test("runs real Pyodide in a worker and completes each micro lesson", async ({
     ["loops", "15"],
     ["functions", "True"],
   ]) {
+    await choosePanel(page, "操作区");
     await page.getByRole("combobox", { name: "课程示例" }).selectOption(id);
     await page
       .getByRole("button", { name: "运行 Python", exact: true })
@@ -41,9 +43,11 @@ test("spreadsheet computes changes and reports unsupported functions", async ({
   await expect(page.getByRole("row", { name: /B4 合计/ })).toContainText("38");
   await page.getByRole("button", { name: "计算并检查" }).click();
   await expect(page.getByRole("status")).toContainText("挑战通过");
+  await choosePanel(page, "操作区");
   await page.getByRole("textbox", { name: /挑战公式/ }).fill("=IF(1,2,3)");
   await page.getByRole("button", { name: "计算并检查" }).click();
   await expect(page.getByRole("status")).toContainText("不支持");
+  await choosePanel(page, "操作区");
   await page.getByRole("textbox", { name: /挑战公式/ }).fill("=30");
   await page.getByRole("button", { name: "计算并检查" }).click();
   await expect(page.getByRole("status")).toContainText("还没通过");

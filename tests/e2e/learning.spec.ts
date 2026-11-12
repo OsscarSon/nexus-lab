@@ -1,19 +1,24 @@
+import { choosePanel } from "../helpers/panels";
 import { test, expect } from "@playwright/test";
 test("complete the course with feedback and persist evidence", async ({
   page,
 }) => {
   await page.goto("/lesson/os-source");
+  await choosePanel(page, "练习");
   await page.getByRole("radio").nth(0).check();
   await page.getByRole("button", { name: "检查答案", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("再想一想");
   const answers = [1, 2, 0, 1, 2, 0];
   for (let i = 0; i < 6; i++) {
+    await choosePanel(page, "练习");
+    const previousTitle = await page.locator("h1").innerText();
     await page.getByRole("radio").nth(answers[i]).check();
     await page.getByRole("button", { name: "检查答案", exact: true }).click();
     await expect(page.getByRole("status")).toContainText("已保存学习进度");
     await page
       .getByRole("link", { name: i === 5 ? "进入模块检查" : "下一课" })
       .click();
+    await expect(page.locator("h1")).not.toHaveText(previousTitle);
   }
   await expect(
     page.getByRole("heading", { name: "开源决策工作表", exact: true }),

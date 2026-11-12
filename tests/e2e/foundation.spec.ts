@@ -2,7 +2,9 @@ import { test, expect } from "@playwright/test";
 test("learner chooses a goal and browses all academies", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("link", { name: "找到我的起点" }).click();
-  await page.getByRole("radio").first().check();
+  await expect(page.getByRole("radio")).toHaveCount(10);
+  await expect(page.locator("input[type=radio]:checked")).toHaveCount(0);
+  await page.getByRole("radio", { name: /开源学院/ }).check();
   await page.getByRole("button", { name: "开始探索" }).click();
   await expect(
     page.getByRole("heading", { name: "开源学院", exact: true }),

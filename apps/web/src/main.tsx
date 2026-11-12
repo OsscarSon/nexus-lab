@@ -8,21 +8,33 @@ import {
   NavLink,
   Route,
   Routes,
-  useParams,
-  useNavigate,
+  useLocation,
 } from "react-router-dom";
 import { academies } from "../../../content/catalog";
+import {
+  Home,
+  Welcome,
+  Learn,
+  Academy,
+  Projects,
+  ProjectDetail,
+  CourseDetails,
+  NotFound,
+} from "./pages";
+import { Icon } from "./components/icon";
+import { recordVisit } from "./activity";
 import { Account, AISettings } from "./account";
-import { read, write } from "./storage";
+
 import "./style.css";
+import "./ui-v2.css";
 import { LabDirectory, LabRoute } from "./labs";
-import { ContinueLearning, Course, Lesson, Assessment } from "./learning";
+import { Course, Lesson, Assessment } from "./learning";
 const nav = [
-  ["/home", "⌂", "首页", "Home"],
-  ["/learn", "▤", "学习", "Learn"],
-  ["/lab", "⚗", "实验室", "Lab"],
-  ["/projects", "▱", "作品", "Projects"],
-  ["/me", "○", "我的", "Me"],
+  ["/home", "home", "首页", "Home"],
+  ["/learn", "learn", "学习", "Learn"],
+  ["/lab", "lab", "实验室", "Lab"],
+  ["/projects", "projects", "作品", "Projects"],
+  ["/me", "me", "我的", "Me"],
 ];
 class Boundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
@@ -46,21 +58,6 @@ class Boundary extends Component<{ children: ReactNode }, { failed: boolean }> {
       this.props.children
     );
   }
-}
-export function AcademyCard({
-  academy: a,
-}: {
-  academy: (typeof academies)[number];
-}) {
-  return (
-    <Link className="card academy" to={"/learn/" + a.id}>
-      <span className="academy-icon">{a.icon}</span>
-      <span className="eyebrow">{a.english}</span>
-      <h3>{a.title}</h3>
-      <p>{a.description}</p>
-      <span className="tag">{a.available ? "开始学习" : "课程规划中"} ↗</span>
-    </Link>
-  );
 }
 function Landing() {
   return (
@@ -89,172 +86,39 @@ function Landing() {
     </section>
   );
 }
-function Welcome() {
-  const navigate = useNavigate();
-  const [goal, setGoal] = useState("opensource");
-  const [error, setError] = useState("");
-  return (
-    <section className="prose">
-      <span className="eyebrow">YOUR FIRST STEP</span>
-      <h1>今天，想探索什么？</h1>
-      <p>选一个方向，我们从一小步开始。之后随时可以改变。</p>
-      <div className="stack">
-        {[
-          ["opensource", "理解开源与协作"],
-          ["ai", "探索人工智能"],
-          ["workspace", "提高工作效率"],
-        ].map(([id, label]) => (
-          <label className="card choice" key={id}>
-            <input
-              type="radio"
-              name="goal"
-              checked={goal === id}
-              onChange={() => setGoal(id)}
-            />
-            {label}
-          </label>
-        ))}
-      </div>
-      <button
-        onClick={() => {
-          if (write("nexus-goal", goal)) navigate("/learn/" + goal);
-          else setError("浏览器无法保存偏好，仍可跳过并继续。");
-        }}
-      >
-        开始探索 →
-      </button>{" "}
-      <Link to="/home">暂时跳过</Link>
-      <p role="status">{error}</p>
-    </section>
-  );
+function VisitObserver() {
+  const { pathname } = useLocation();
+  React.useEffect(() => {
+    recordVisit(pathname);
+  }, [pathname]);
+  return null;
 }
-function Home() {
+function Breadcrumb() {
+  const { pathname } = useLocation();
+  const a = academies.find((a) => pathname.startsWith("/learn/" + a.id));
+  const title =
+    a?.title ||
+    (
+      {
+        "/home": "学习空间",
+        "/learn": "学院目录",
+        "/lab": "互动实验室",
+        "/projects": "作品与证据",
+        "/me": "我的空间",
+        "/welcome": "选择方向",
+      } as Record<string, string>
+    )[pathname] ||
+    (pathname.startsWith("/lesson/")
+      ? "课时学习"
+      : pathname.startsWith("/lab/")
+        ? "互动实验室"
+        : pathname.startsWith("/projects/")
+          ? "作品详情"
+          : "探索空间");
   return (
-    <>
-      <div className="page-heading">
-        <span className="eyebrow">YOUR LEARNING SPACE</span>
-        <h1>
-          你好，探索者<span className="mint">。</span>
-        </h1>
-        <p>不必一次学会所有。今天，只向前一小步。</p>
-      </div>
-      <section className="feature">
-        <div>
-          <span className="eyebrow">NEXT SMALL STEP</span>
-          <h2>
-            从好奇心开始，
-            <br />
-            建立你的第一条学习路径。
-          </h2>
-          <ContinueLearning />
-        </div>
-        <div className="diagram" aria-hidden="true">
-          <i>?</i>
-          <span>好奇 → 探索 → 创造</span>
-        </div>
-      </section>
-      <div className="section-title">
-        <h2>为你推荐的方向</h2>
-        <Link to="/learn">全部 10 个学院 →</Link>
-      </div>
-      <div className="grid">
-        {academies
-          .filter((a) =>
-            ["opensource", "workspace", "programming"].includes(a.id),
-          )
-          .map((a) => (
-            <AcademyCard key={a.id} academy={a} />
-          ))}
-      </div>
-    </>
-  );
-}
-function Learn() {
-  const [query, setQuery] = useState("");
-  const results = academies.filter((a) =>
-    (a.title + a.english).toLowerCase().includes(query.toLowerCase()),
-  );
-  return (
-    <>
-      <span className="eyebrow">EXPLORE YOUR NEXT CHAPTER</span>
-      <h1>十个方向，无限可能。</h1>
-      <p>找到感兴趣的领域，从适合初学者的一步开始。</p>
-      <label className="search">
-        搜索学院
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="例如：开源、Programming"
-        />
-      </label>
-      <div className="grid">
-        {results.map((a) => (
-          <AcademyCard key={a.id} academy={a} />
-        ))}
-      </div>
-      {!results.length && (
-        <p role="status">没有找到匹配的学院。试试其他关键词。</p>
-      )}
-    </>
-  );
-}
-function Academy() {
-  const { academy } = useParams();
-  const a = academies.find((a) => a.id === academy);
-  if (!a) return <Missing />;
-  return (
-    <section className="prose">
-      <Link to="/learn">← 所有学院</Link>
-      <p className="eyebrow">{a.english}</p>
-      <h1>{a.title}</h1>
-      <p>{a.description}</p>
-      <div className="card">
-        <h2>从理解开始，向创造前进。</h2>
-        {a.id === "opensource" ? (
-          <>
-            <p>M01 · 开源素养 · 6 节短课与决策工作表</p>
-            <Link className="button" to="/learn/opensource/foundations">
-              开始开源基础 →
-            </Link>
-          </>
-        ) : (
-          <>
-            <p>课程正在建设中。发布前不会显示为可用课程。</p>
-            <Link to="/lab">尝试互动实验 →</Link>
-          </>
-        )}
-      </div>
-    </section>
-  );
-}
-function Projects() {
-  return (
-    <>
-      <h1>你的创造，从这里生长。</h1>
-      <div className="card">
-        {read("nexus-worksheet", null) ? (
-          <>
-            <h2>开源决策工作表 ✓</h2>
-            <p>你已完成三个项目的授权分类。成果仅保存在本机。</p>
-            <Link to="/learn/opensource/assessment">重新练习 →</Link>
-          </>
-        ) : (
-          <>
-            <h2>还没有作品</h2>
-            <p>完成开源模块检查，保存你的第一份决策工作表。</p>
-          </>
-        )}
-        <Link to="/learn">探索学习方向 →</Link>
-      </div>
-    </>
-  );
-}
-function Missing() {
-  return (
-    <>
-      <h1>找不到这个页面</h1>
-      <Link to="/home">回到首页 →</Link>
-    </>
+    <span className="breadcrumb">
+      探索 <span>/</span> {title}
+    </span>
   );
 }
 const Router = STATIC_DEPLOYMENT ? HashRouter : BrowserRouter;
@@ -271,6 +135,7 @@ function App() {
   }, []);
   return (
     <Router>
+      <VisitObserver />
       <a
         className="skip"
         href="#main"
@@ -287,7 +152,9 @@ function App() {
       </a>
       <aside>
         <Link className="brand" to="/">
-          N
+          <span className="brand-mark">
+            <Icon name="lab" size={24} />
+          </span>
           <span>
             NEXUS LAB<small>好奇心的实验室</small>
           </span>
@@ -295,7 +162,7 @@ function App() {
         <nav aria-label="主要导航">
           {nav.map(([path, icon, zh, en]) => (
             <NavLink key={path} to={path}>
-              <b aria-hidden="true">{icon}</b>
+              <Icon name={icon} />
               <span>
                 {zh}
                 <small>{en}</small>
@@ -311,8 +178,15 @@ function App() {
       </aside>
       <div className="shell">
         <header>
-          <span>探索 / 学习空间</span>
-          <Link to="/learn">搜索学院 ⌕</Link>
+          <Breadcrumb />
+          <Link
+            className="header-search"
+            to="/learn"
+            aria-label="搜索与探索学院"
+          >
+            <Icon name="search" size={18} />
+            <span>搜索与探索学院</span>
+          </Link>
           <Link className="avatar" aria-label="我的账户" to="/me">
             N
           </Link>
@@ -344,9 +218,14 @@ function App() {
               <Route path="/lab/:labId" element={<LabRoute />} />
               <Route path="/opensource/git-playground" element={<LabRoute />} />
               <Route path="/projects" element={<Projects />} />
+              <Route path="/projects/:projectId" element={<ProjectDetail />} />
+              <Route
+                path="/learn/:academy/curriculum/:courseId"
+                element={<CourseDetails />}
+              />
               <Route path="/me" element={<Account />} />
               <Route path="/settings/ai" element={<AISettings />} />
-              <Route path="*" element={<Missing />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </Boundary>
           <footer>

@@ -1,4 +1,6 @@
-# UI/UX Site-wide Specification
+# UI/UX Site-wide Specification — V2
+
+UI V2 的已实现模块与验收见 [UI_V2.md](UI_V2.md)；以下未实现路由仍为产品规划，不能作为已发布功能。
 
 ## Design principles
 十个学院同等重要，无主次之分。实现时间与课程数量不决定导航地位或卡片视觉权重。遵循 [PRODUCT_SPEC.md](PRODUCT_SPEC.md) 的内容发布/学习进度状态区分与 [ROADMAP.md](ROADMAP.md) 的后续排期。
@@ -6,7 +8,7 @@
 Quiet, bright, modern science laboratory; simple first, advanced on demand. Friendly to teens and beginner learners. No intimidating dashboard metrics, dense neon UI, unnecessary gamification or infinite sidebars.
 
 ## Tokens
-Canvas #F7F9FC; card #FFFFFF; ink #16273A; muted #64748B; accent #70CDB6; accent-secondary #91AFCB; borders #E5EBF1; focus visible high contrast. Dark mode optional. Primary content max width 1160px; prose max width 720px. Space scale 4/8/12/16/24/32. 8–16px radii by component size. Use readable sizes, clear focus rings, reduced motion settings, and accessible color contrast.
+Canvas #F7F9FC; card #FFFFFF; ink #16273A; muted #526477; accent #70CDB6; accent-secondary #91AFCB; borders #E5EBF1; focus visible high contrast. Dark mode optional. Primary content max width 1160px; prose max width 720px. Space scale 4/8/12/16/24/32. 8–16px radii by component size. Use readable sizes, clear focus rings, reduced motion settings, and accessible color contrast.
 
 ## Global nav
 Desktop: slim left rail with Home, Learn, Lab, Projects, Me; top global search, help, account. Mobile: bottom five-item nav, responsive drawers, no permanent desktop sidebars. Floating contextual Mentor only in lessons/labs; optionally launch from global search. User should never see >5 major navigation options at once.
@@ -20,7 +22,7 @@ Desktop: slim left rail with Home, Learn, Lab, Projects, Me; top global search, 
 - `/learn/:academy/:course` course outline: modules, prerequisites, time, project outcome, progress.
 - `/lesson/:lessonId` lesson: title, objective, one concept, illustration, live example, challenge, help; desktop optional two-pane; mobile tabs.
 - `/paths` learning path directory and plan detail.
-- `/lab` searchable 12+ labs, difficulty, device labels.
+- `/lab`: 当前 4 个已开放实验可搜索；可切换查看 5 类未来实验的规划说明，不提供假操作。更多实验与能力筛选按实际实现逐步加入。
 - `/lab/:labId` focused workspace: task, editor/interactive surface, results, hints, save.
 - `/opensource/explorer` controlled GitHub metadata inspector, file map, trust and licensing notes.
 - `/opensource/git-playground` simulated Git training, graph and guided commands.
@@ -35,7 +37,7 @@ Desktop: slim left rail with Home, Learn, Lab, Projects, Me; top global search, 
 - `/admin` protected management route: content publishing, provider limits, costs and abuse monitoring.
 
 ## Lesson layout
-Desktop: 240px collapsible lesson outline, 55% readable lesson pane, optional 45% lab/preview pane; collapse outline by default for small laptops. Mobile: lesson body with sticky `Try` button and tabs `Learn | Practice | Result`; bottom nav hidden during full-screen editor. Mentor opens as drawer, never obscures task.
+Desktop: 可折叠课程目录、并列的阅读与练习/反馈面板。Mobile: `学习 | 练习 | 结果` 标签；实验为 `任务说明 | 操作区 | 结果`，切换保留输入与运行状态。五项底部导航保留安全区域，正文和可聚焦操作预留滚动空间；本轮没有全屏编辑器。Mentor 使用紧凑可展开面板，不遮挡当前任务。
 
 ## Key UI states
 Every asynchronous surface has loading, skeleton, empty, error, offline, rate-limited and success states. Labs have explicit `simulation` vs `real execution` labels. Google integrations show scopes and confirmation before mutating a user's account. Never silently bill, send emails or publish a repository.
@@ -46,7 +48,7 @@ AcademyCard, CourseCard, LessonStep, ConceptExplanation, GuidedExample, CodeEdit
 ## UX acceptance
 First-time learner: starting from `/`, choose any of the ten academy goals with equal navigation depth. If a relevant lab is available, open it within <=4 clear clicks; otherwise show its real planned status and optional shared exercises without implying the academy curriculum is complete. No API key prompt. All important touch targets >=44px; keyboard tab order logical; all basic lessons work on mobile; slow network degrades gracefully.
 
-## 跨学院一致性验收（目标，尚未全部实现）
+## 跨学院一致性验收（UI 已接入，完整课程图仍为后续目标）
 
 所有学院复用同一课程概览、课时、测评反馈、进度和作品组件。共享课时显示当前路径的返回入口与已有证据，不要求绕道原始实现学院。学院图标/强调色可不同，但卡片尺寸、标题级别、按钮能力与访问深度一致；筛选后的结果可以不同，不形成永久主次。
 

@@ -1,12 +1,14 @@
 # Current status
 
-Phases 0–3 are implemented and verified. Phase 4 account/sync, gateway controls and non-generative assistance are implemented and verified locally; live AI provider validation is blocked by absent server credentials/configuration. No public deployment, remote CI run or environment publication has been verified. Initial implementation branch: `development/phases-0-4`. The publication preparation branch is `develop/nexus-academy`; the requested main update must preserve this history through a normal merge, never a force-push.
+Phases 0–3 remain implemented; Phase 4 accounts/sync, gateway controls and non-generative assistance remain available, while live AI still requires unconfigured provider credentials. UI/UX V2 is implemented on `develop/ui-v2`; its current validation and limitations are summarized in the final UI V2 section below. This branch has not been pushed or deployed.
 
-## 十个学院平等：本轮文档更新与真实实现边界
+上次发布已核实 `main` 为 `fb28a6f`，远端质量检查通过；当时 Pages 部署被仓库启用设置阻塞。本轮没有重新检查线上状态，也没有修改远端 main。以下旧阶段与文档检查点保留为历史记录，最新 UI 实现状态以文末为准。
+
+## 历史检查点：十个学院平等文档与当时实现边界
 
 已采纳：十个学院同等重要，不设主学院或次学院。开源 M01 只是首个学习引擎实现案例。PRODUCT_SPEC、ARCHITECTURE、UI_SPEC、ROADMAP 和历史 PHASES 已对齐：全部学院拥有同等入口及共同的课程、互动课、测评、进度与作品契约；共享主题通过稳定 ID 和依赖图复用。
 
-**本轮仅更新规范与文档。共享课程图、跨学院通用渲染/进度迁移和中立推荐尚未实现。** 既有课程、路由、ID、localStorage 键、SQLite 数据格式和实际学习数据均未修改；此前 Phases 0–4 的可用功能与 AI 凭据阻塞保持原状。
+**该历史检查点仅更新规范与文档。当时共享课程图、跨学院通用渲染/进度迁移和中立推荐尚未实现；UI V2 已落实中立入口与呈现层，完整课程图和服务端迁移仍待后续。** 既有课程、路由、ID、localStorage 键、SQLite 数据格式和实际学习数据均未修改；此前 Phases 0–4 的可用功能与 AI 凭据阻塞保持原状。
 
 ### 当前已验证内容与规划内容
 
@@ -25,14 +27,14 @@ Phases 0–3 are implemented and verified. Phase 4 account/sync, gateway control
 
 上表不重新分配现有实验所有权。Python、逻辑门、公式与 Git 是可复用能力，不能因为首先在某处展示就成为该学院的独占资源。上述“已验证”指历史技术/功能检查，内容尚未经过外部专家审核。
 
-### 已确认的架构差距与下一步
+### UI V2 前已确认的架构差距（已修复项见文末）
 
 - 十学院已有同级目录卡片，但首次引导仅列三个方向且默认开源；首页首个课时/续学以及推荐方向仍有固定选择，不满足新的中立策略。
 - `apps/web/src/learning.tsx`、课程路由、进度统计与账号界面仍以开源六课为基准；`available` 学院级布尔值不足以表达各课程发布状态。
 - 服务端进度 ID 校验、Mentor 课程上下文及无上下文回退仍直接引用开源列表。不能宣称所有学院已获得完整通用引擎接入。
 - 实验框架、真实 Python、公式引擎和本机证据可用；共享课程注册表、依赖图、跨路径完成抵扣和统一项目模板/保存能力尚待实现。
 
-下一轮优先按 ROADMAP 的 A→B→C 落实平等入口、共享注册表/依赖图和兼容进度迁移，再依据实际需求选择十学院的课程切片；不因开源实现较早继续默认优先。实时 AI 验证仍是可独立处理的凭据阻塞项，不阻塞本次架构方向。
+原计划按 ROADMAP 的 A→B→C 推进；UI V2 已落实 A 和部分前端呈现切片，后续继续共享注册表/依赖图和兼容服务端进度迁移，再依据实际需求选择十学院的课程切片；不因开源实现较早继续默认优先。实时 AI 验证仍是可独立处理的凭据阻塞项，不阻塞本次架构方向。
 
 本轮验证结果见文末“平等学院文档变更验证”；以下阶段检查保留为历史证据，不将设计更新计作新功能交付。
 
@@ -117,3 +119,42 @@ Deferred limitations: no BYOK/local generative model, streaming, password recove
 Gitleaks 使用经过官方发布校验和核验的版本扫描全部 8 个既有提交、最终待提交文件及 Pages 静态产物，三次扫描均未发现泄露。扫描工具和报告留在忽略的 .cache 中，不提交。GitHub API 读取曾返回 Forbidden，Git fetch 正常；不能据此假定 Git push 成功或失败。推送结果以真实 Git 操作及远端 SHA 为准。
 
 Pages 代码和工作流准备就绪不代表线上部署成功。首次部署可能需要在仓库 Settings → Pages 将 Source 设为 GitHub Actions，并允许 Actions 与 github-pages 环境。只有远端工作流成功及站点验证后才能宣称部署完成；最终 Git 推送与站点验证状态见本次发布报告。
+
+## UI V2 — 第一组模块检查点
+
+开发分支 `develop/ui-v2`。延续原薄荷/深绿视觉，新增统一 SVG 图标、十学院无默认选择的引导、同级可搜索目录与实际内容筛选、统一目标/初阶/进阶/高阶概览及课程说明。首页移除固定开源起点，根据真实历史/原进度/所选方向续学；无记录时显示中立起点。作品卡片、详情和主动 JSON 导出读取原有工作表、Git/逻辑门、公式、Python 证据，不写回或迁移原数据。新增独立本机访问历史键 `nexus-ui-history`，访问不等于完成。
+
+首组检查：typecheck、lint、47 项测试、生产构建、桌面/移动引导与七个代表页面 WCAG A/AA/无溢出检查通过。检查发现并修正了搜索框对比度与移动搜索图标可访问名称。课时/实验的响应式面板与完整回归仍在后续模块进行，不能将本检查点称为 UI V2 全部完成。详细设计见 UI_V2.md。
+
+## UI/UX V2 — 已实现并完成本地验证
+
+当前开发分支：`develop/ui-v2`。首个模块提交为 `b0c37f1`；后续工作区/课时模块保留在同一开发分支，不自动推送或部署到 main。
+
+### 已完成
+
+- 保留浅色薄荷、深绿、白色卡片与圆角留白；统一内联 SVG 图标、标题/状态标签、原生进度、轻阴影、焦点与微交互。设计细化独立于基础样式放在 `ui-v2.css`，无新增运行时依赖。
+- 十学院完整同级引导，无预选学院；目录支持搜索与可用/规划内容筛选。所有学院复用目标、先修、初阶/进阶/高阶课程结构、状态说明和相关方向/练习入口；规划内容无假开始按钮，既有 Python/Git/逻辑门/公式为共享实践，不冒充完整学院课程。
+- 首页提供基于真实目标/访问/完成证据的继续学习、简洁进度、最近实验和作品、中立的新用户起点及清楚的全部学院入口。旧 v1 完成记录没有 lastLesson/访问历史时也能续学；仅有 Python 成果时不会显示另一学院的零进度。
+- 作品页从原工作表、Git/逻辑门、公式和 Python 成功证据生成卡片、筛选、详情及主动 JSON 导出；没有记录时显示空状态，记录缺失/格式异常不假设完成，也不删除原始数据。起步模板链接真实练习，未实现独立项目编辑器/云项目保存。
+- 课时提供目标、短概念、实际互动示例、检查题/提示/反馈和下一课；桌面阅读与练习/结果并列，移动用学习/练习/结果标签。Git、逻辑门、Python、公式采用任务/操作/结果共同面板。切换保留挂载和输入；检查/reset/undo/运行均继续执行真实既有逻辑。
+- Python 继续真实 Pyodide/worker 执行、按需加载、超时和停止；停止后返回可重新加载的操作区，输出标明实际执行输入。公式解释器继续报告真实计算、支持子集及错误。
+- Mentor 紧凑展开，支持 Explain/Hint/Debug/Build、来源标识、清空与使用额度入口。无课时上下文时采用中立的非生成式教学内容，不再默认回答开源第一课；认证、预算、服务端 provider 与密钥边界未改。
+- 移动五项导航保留 safe-area；正文/可聚焦操作预留底部滚动空间，标签支持方向键/Home/End，关键控件保持 44px 目标。默认浅色主题；无全屏编辑器、深色主题或重量级动画。
+
+### 最终验证
+
+- `pnpm lint`、`pnpm typecheck`：通过。
+- `pnpm test`：48 项通过，含十学院结构、真实可用路由、旧数据只读兼容、证据验证和中立回退。
+- `CHROMIUM_PATH=/usr/bin/chromium pnpm test:e2e`：32 项通过，含原 Phase 0–4 流程、十学院页面、真实 Pyodide 三个示例、公式/挑战/同步/AI 回退、作品导出、旧记录续学、面板状态/键盘导航、底部导航避让。
+- 浏览器套件内的 WCAG A/AA 与无页面水平溢出检查覆盖 11 个代表页面，分别验证桌面和 Pixel 7 Chromium 模拟布局；另外有 360px、四倍 CPU 降速与未主动加载时无 wasm/zip 请求检查。模拟检查不等于真实 Android 硬件或完整人工辅助技术认证。
+- `pnpm build` 与 `pnpm test:production`：通过，生产 CSP 下实际 Python 和非生成式帮助可用。构建仅有既有 Zod 注解警告。
+- `pnpm build:pages` 与 `pnpm test:pages`：4 项桌面/移动测试通过，验证 `/nexus-lab/` 导航/刷新、学习记录、手机面板、无后端请求与真实 Python 资源。最后重新执行普通 `pnpm build`，将本机 dist 恢复为完整应用模式。
+- 生成并审阅 `.cache/ui-v2/` 桌面/手机首页、学院、课时、实验及作品截图；截图与浏览器测试记录未提交为应用用户数据。
+
+本轮发现并修复了搜索对比度、图标链接名称、旧课程进度条 ARIA、Python 停止返回面板及没有新历史的旧用户续学问题。浏览器测试等待目标面板挂载，不用强制点击或禁用断言规避手机异步路由。
+
+### 保留的边界
+
+没有更改旧内容 ID、路由、localStorage 键或 SQLite 格式，没有迁移/清空用户数据。新增 `nexus-ui-history` 仅保存至多 12 条实际访问；访问不算完成。账户课程同步与非生成式帮助/平台 AI 的原有限制不变；Pages 仍明确不提供后台账户/同步/生成式 AI。当前改动未推送，不能宣称线上 UI 已更新。
+
+完整跨学院课程依赖图、通用后端课时注册/新进度格式、十学院完整课程、云作品编辑器、深色模式和真实设备验收仍是后续工作。实时 AI 仍因没有有效服务端 provider 配置而未验证。下一步应继续共享课程图与证据兼容工作，不因首个课程实现较早而优先某学院。

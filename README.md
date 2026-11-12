@@ -1,6 +1,6 @@
 # NEXUS LAB
 
-Chinese-first interactive technology academy. All ten academies are equally important and share one learning platform; Open Source M01 is the first implementation example, not a central academy. The proposed shared curriculum graph and neutral-engine migration are documented, not yet implemented. See [product principles](docs/PRODUCT_SPEC.md), [architecture](docs/ARCHITECTURE.md), [roadmap](docs/ROADMAP.md) and [current implementation status](docs/CURRENT_STATUS.md).
+Chinese-first interactive technology academy. All ten academies are equally important and share one learning platform; Open Source M01 is the first implementation example, not a central academy. UI V2 provides academy-neutral presentation and shared practice entry points. The full curriculum dependency graph and backend progress migration remain planned. See [product principles](docs/PRODUCT_SPEC.md), [architecture](docs/ARCHITECTURE.md), [roadmap](docs/ROADMAP.md) and [current implementation status](docs/CURRENT_STATUS.md).
 
 ## Development
 
@@ -62,3 +62,16 @@ For a built application, run `pnpm build` then `pnpm start`. Full environment va
 静态版保留本机课程进度、Git/逻辑门/公式实验和真实浏览器 Python。注册、登录、服务器进度同步、服务器额度查询及生成式 AI 不可用，界面明确标注且不会发送 API 请求；课程引导为本机非生成式内容。既有 localStorage 键不变，但 GitHub Pages 与本机服务器是不同来源，浏览器不会自动搬迁来源之间的数据。
 
 静态构建验证：`pnpm build:pages`，然后 `CHROMIUM_PATH=/usr/bin/chromium pnpm test:pages`。该测试只启动静态预览，不启动后端，覆盖桌面/移动端子路径、刷新、学习记录、课程帮助和真实 Python 资源加载。后端浏览器回归使用隔离的 3101 端口与临时数据库，不接触正在运行的 3001 开发服务。默认开发代理仍为 3001；测试可通过 `NEXUS_DEV_API_TARGET` 显式指定其他目标。
+
+
+## UI/UX V2
+
+延续薄荷绿与深绿视觉，新增统一 SVG 图标、真实学习首页、十学院同级目录与完整引导、统一学院目标/分级规划/课程说明、作品卡片/详情/证据导出，以及课时和实验的手机标签面板。没有学习记录时不默认导向某个学院；原有完成记录与练习成果可直接读取，无需清空或迁移。
+
+新增路由：`/learn/:academy/curriculum/:courseId` 查看实际课程或规划说明，`/projects/:projectId` 查看本机学习证据。已有所有课程、测评和实验 URL 保留。项目模板链接到真实练习；独立项目编辑器与云项目存储尚未实现。发布状态和学习者完成状态分别显示。
+
+`content/experience.ts` 管理学院展示与共享练习引用；`apps/web/src/activity.ts` 兼容读取原有证据并用独立 `nexus-ui-history` 键保存最近访问；访问不算完成。`components/ui.tsx` 提供保留状态的响应式面板和原生进度组件；`ui-v2.css` 为独立的设计细化层。没有新增运行时依赖。
+
+Python 继续按需加载，页面切换标签不会销毁 worker；停止操作会终止运行时并返回操作区。Mentor 清楚标明 AI 或非生成式内容，无课时上下文时提供通用学习帮助。账户/API/Pages 限制保持原有安全边界。
+
+设计与验证范围见 [docs/UI_V2.md](docs/UI_V2.md)。桌面/移动浏览器回归包含真实 Python、原有 Phase 0–4 流程、旧数据兼容、十学院入口、作品导出、360px/4倍 CPU 降速检查、标签键盘操作与安全区域。降速与 Pixel 7 浏览器模拟不等于真实 Android 设备验收；深色主题本轮未实现。

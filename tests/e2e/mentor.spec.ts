@@ -1,3 +1,4 @@
+import { choosePanel } from "../helpers/panels";
 import { test, expect } from "@playwright/test";
 test("optional accounts sync progress across browser contexts, logout and delete", async ({
   page,
@@ -16,6 +17,7 @@ test("optional accounts sync progress across browser contexts, logout and delete
     page.getByRole("heading", { name: "你好，" + username }),
   ).toBeVisible();
   await page.goto("/lesson/os-source");
+  await choosePanel(page, "练习");
   await page.getByRole("radio").nth(1).check();
   await page.getByRole("button", { name: "检查答案", exact: true }).click();
   await expect(page.getByRole("status")).toContainText("已保存学习进度");
