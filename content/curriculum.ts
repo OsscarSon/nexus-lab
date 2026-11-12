@@ -1,3 +1,4 @@
+import { addStarterCurriculum } from "./starter-curriculum";
 import { academies } from "./catalog";
 import { pythonSamples } from "./python";
 import { academyPlans } from "./academy-plans";
@@ -147,4 +148,6 @@ export function baseCatalog(): Catalog {
     ],
   };
 }
-export const curriculum = new CurriculumRegistry(baseCatalog());
+export const curriculum = new CurriculumRegistry(
+  addStarterCurriculum(baseCatalog()),
+);

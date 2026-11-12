@@ -12,18 +12,18 @@ Phases 0–3 remain implemented; Phase 4 accounts/sync, gateway controls and non
 
 ### 当前已验证内容与规划内容
 
-| 学院 | 当前已有学习内容/能力 | 尚待规划或实现的范围 |
-| --- | --- | --- |
-| 编程 | 平台实验目录有三个真实 Python 微课（变量、循环、函数） | 独立编程学习路径与统一课程图接入尚未实现 |
-| 人工智能 | 学院目录与目标页面；平台共享 Mentor 网关/回退可用 | 学院课程、练习、测评与作品路径规划中；共享 Mentor 不代表 AI 学院课程完成 |
-| 游戏开发 | 学院目录与目标页面 | 学院课程、练习、测评与作品路径规划中 |
-| 计算机工程 | 平台实验目录有逻辑门模拟与真值表挑战 | 学院课程编排与统一学习证据接入尚未实现 |
-| 网站与云端 | 学院目录与目标页面 | API/云部署等课程与作品路径规划中 |
-| 网络与安全 | 学院目录与目标页面 | 学院课程、练习、测评与作品路径规划中 |
-| 机器人与物联网 | 学院目录与目标页面 | 学院课程、练习、测评与作品路径规划中 |
-| 未来科技 | 学院目录与目标页面 | 学院课程、练习、测评与作品路径规划中 |
-| 效率与自动化 | 平台实验目录有真实公式计算练习 | 学院完整课程/任务路径与共同作品接入尚未实现 |
-| 开源学院 | M01 六课、检查题、分类测评/本机工作表；共享 Git 模拟可用 | M02–M12 课程尚未实现；首个模块不代表整学院已完成 |
+| 学院           | 当前已有学习内容/能力                                    | 尚待规划或实现的范围                                                     |
+| -------------- | -------------------------------------------------------- | ------------------------------------------------------------------------ |
+| 编程           | 平台实验目录有三个真实 Python 微课（变量、循环、函数）   | 独立编程学习路径与统一课程图接入尚未实现                                 |
+| 人工智能       | 学院目录与目标页面；平台共享 Mentor 网关/回退可用        | 学院课程、练习、测评与作品路径规划中；共享 Mentor 不代表 AI 学院课程完成 |
+| 游戏开发       | 学院目录与目标页面                                       | 学院课程、练习、测评与作品路径规划中                                     |
+| 计算机工程     | 平台实验目录有逻辑门模拟与真值表挑战                     | 学院课程编排与统一学习证据接入尚未实现                                   |
+| 网站与云端     | 学院目录与目标页面                                       | API/云部署等课程与作品路径规划中                                         |
+| 网络与安全     | 学院目录与目标页面                                       | 学院课程、练习、测评与作品路径规划中                                     |
+| 机器人与物联网 | 学院目录与目标页面                                       | 学院课程、练习、测评与作品路径规划中                                     |
+| 未来科技       | 学院目录与目标页面                                       | 学院课程、练习、测评与作品路径规划中                                     |
+| 效率与自动化   | 平台实验目录有真实公式计算练习                           | 学院完整课程/任务路径与共同作品接入尚未实现                              |
+| 开源学院       | M01 六课、检查题、分类测评/本机工作表；共享 Git 模拟可用 | M02–M12 课程尚未实现；首个模块不代表整学院已完成                         |
 
 上表不重新分配现有实验所有权。Python、逻辑门、公式与 Git 是可复用能力，不能因为首先在某处展示就成为该学院的独占资源。上述“已验证”指历史技术/功能检查，内容尚未经过外部专家审核。
 
@@ -68,12 +68,11 @@ Current limitations: Git is a deliberately scoped teaching simulator; merging, c
 
 Pinned Pyodide 0.29.3 is copied from the integrity-locked npm package into local static assets at dev/build time; no runtime CDN dependency. The lazy Python view starts a dedicated worker only on request. Three real Python micro-lessons (variables, accumulation, functions/conditions) accept bounded integer inputs and validate actual CPython output. Stop terminates the worker; loading has a 45-second deadline and execution a 5-second deadline. Programs are curated, not arbitrary code, so no arbitrary imports/packages are exposed. Output is capped at 10 KB.
 
-Spreadsheet interpreter supports numeric literals, cell references, + - * /, unary signs, parentheses, SUM/AVERAGE/MIN/MAX with same-column ranges or argument lists. It detects unknown references, unsupported functions, division by zero, cycles and bounded nesting. No eval or dynamic code execution. Budget challenge is checked against multiple input fixtures to reject hardcoded answers.
+Spreadsheet interpreter supports numeric literals, cell references, + - \* /, unary signs, parentheses, SUM/AVERAGE/MIN/MAX with same-column ranges or argument lists. It detects unknown references, unsupported functions, division by zero, cycles and bounded nesting. No eval or dynamic code execution. Budget challenge is checked against multiple input fixtures to reject hardcoded answers.
 
 Validation: typecheck, lint, 23 domain tests, build, 12 desktop/mobile browser tests. Browser tests actually load WebAssembly and execute all three Python programs, assert outputs 14 / 15 / True, then terminate the worker. Formula tests exercise success, changing cells, unsupported expressions and hardcoded answer rejection. Earlier tests remain green.
 
 Formatting is standardized with Prettier. Optional arbitrary Python editing, PyPI imports, full Excel compatibility and offline PWA caching are outside this scope. Next: authenticated server AI gateway with durable limits and honest fallback.
-
 
 ## Phase 4 — implemented; live provider verification blocked
 
@@ -98,13 +97,11 @@ No server provider key, endpoint/model or current token prices are configured. L
 
 Deferred limitations: no BYOK/local generative model, streaming, password recovery/MFA, cloud lab artifact sync, multi-instance distributed ledger, full Excel, arbitrary Python execution, PWA offline installation or externally reviewed curriculum. Optional accounts run on this backend, not a deployed managed identity service. The original next-task suggestion was account/privacy hardening or a credentialed provider smoke test. It is superseded by the equal-academy roadmap above; these remain independently useful work. Phases 5+ have not started. See `docs/ENVIRONMENT.md` for reproducible startup, data retention, quotas, proxy settings and deployment boundaries.
 
-
 ## 平等学院文档变更验证
 
 本轮只修改 README、AGENTS、PRODUCT_SPEC、ARCHITECTURE、UI_SPEC、CURRENT_STATUS、历史 PHASES，并新增 ROADMAP。没有改动应用代码、课程内容、依赖/锁文件、学习数据格式或数据库；没有运行迁移。
 
 `pnpm typecheck`、`pnpm lint`、`pnpm test`（41 项）及 `pnpm build` 全部通过；`git diff --check` 通过。构建仍仅有既有 Zod 注解警告。已检查本轮文档的相对链接与十学院覆盖。未重复运行浏览器或实时 AI 检查，不将历史 20 项浏览器结果计作本轮新执行结果。
-
 
 ## GitHub main 与 Pages 发布准备
 
@@ -167,7 +164,7 @@ Pages 代码和工作流准备就绪不代表线上部署成功。首次部署�
 
 ## Phase 5B — 共享课程注册表与依赖图
 
-新增 Zod 校验的 Academy、Topic、LearningPath、Course、Module、Lesson、Assessment、ProjectTemplate、Lab 和带确切版本的 ContentRef；内容身份为 kind/id，旧六课 os-* ID 与 M01 路由别名保持。新内容仅以引用复用。注册表拒绝重复 ID、悬空引用、错版本、required/recommended 循环（包括容器展开边）、空已发布课程以及不可完成的已发布硬依赖。related 链接不锁课，先修查询返回原因和已有证据满足情况；路径需求去重。
+新增 Zod 校验的 Academy、Topic、LearningPath、Course、Module、Lesson、Assessment、ProjectTemplate、Lab 和带确切版本的 ContentRef；内容身份为 kind/id，旧六课 os-\* ID 与 M01 路由别名保持。新内容仅以引用复用。注册表拒绝重复 ID、悬空引用、错版本、required/recommended 循环（包括容器展开边）、空已发布课程以及不可完成的已发布硬依赖。related 链接不锁课，先修查询返回原因和已有证据满足情况；路径需求去重。
 
 5B 验证：typecheck、lint、60 项测试及生产构建通过。11 项图/模式测试覆盖失效条件与去重。本提交尚未替换运行时学习页面或迁移学习记录；5C 接入通用体验与兼容存储后，5D 再发布十学院新切片。
 
@@ -178,3 +175,27 @@ Pages 代码和工作流准备就绪不代表线上部署成功。首次部署�
 新增独立本机 nexus-curriculum-progress v2 键及一次性原始字节备份；旧 v1、异常 JSON、未知 ID、旧版本记录不会被静默删除，不猜测未知历史时间。存储失败不覆盖原数据。SQLite 在事务内保存 v2，并将原数据完整保留到 progress_backups；旧 /api/progress 继续支持原六课，新 /api/progress/v2 对证明重新执行同一内容量规并保留账号隔离。删除账号同时删除学习备份，匿名费用账本不变。新增只读课程目录/课程/课时 API；Mentor 查询相同的已发布课程上下文，认证/配额/平台密钥边界未放宽。
 
 5C 验证：lint、typecheck、69 项测试、原有 32 项桌面/移动浏览器回归、production/Pages 构建、4 项静态 Pages 检查通过。测试覆盖备份、异常记录、旧协议/新协议、拒绝错版本/错误量规、共享去重和硬先修。一次幂等测试初版误比较新 JSON 字段顺序，已改为结构相等；原始旧数据仍按字节验证。十学院新课时尚在下一阶段发布，不能据本检查点宣称十套课程已上线。
+
+## Phase 5D — 十学院真实入门模块与最终回归
+
+Phase 5A、5B、5C、5D 本轮开发范围已实现，待 PR 审查；不表示十套完整课程或线上部署完成。当前分支 feature/phase5-curriculum 含原 UI V2 历史及四阶段提交，main 保持不动。课程内容清单见 CONTENT_INVENTORY.md。
+
+- 十学院分别发布：Python 变量与表达式、提示结构与结果验证、游戏规则与计分、AND 与真值表、HTTP 请求入门、最小权限入门、传感/阈值/控制、预测/模型/实测、预算公式与数据接口、源码可见与许可判断。14 个新唯一课时以 18 个位置被十条路径引用，每院一个模块/课程/项目模板；旧 M01 六课和工作表继续可用。
+- 每课有华文目标、讲解、实例、可操作练习、自动量规、测验解释、完成记录与下一课建议。新课必须互动和测验同时通过；旧六课保持原完成语义。API、Git、证据辨析共享课时只存一份，完成抵扣按规范身份去重；项目需要各自独立课程要求。
+- Python 练习直接调用真实现有 Pyodide；程序从同一 canonical source 构建给 worker，避免维护两份程序。公式用真实解释器校验三组数据。Git/逻辑门仍明确为模拟；HTTP/传感/游戏是可检查状态模型，AI 提示为非生成式规则检查，不冒充外部服务或硬件。
+- 通用课程/课时/独立测评支持同一注册表；独立测评只能授予自身证据。补齐不可测评先修、无解互动、Python 期望输出验证；学习界面懒加载，重运行时继续按需加载。原始本机键/SQLite 行先备份，未知/损坏/旧版本证据保留待解析，不删除学习数据。
+
+### 最终验证（2026-11-12）
+
+- pnpm lint、pnpm typecheck：通过。
+- pnpm test：10 个文件，84 项 unit/API 测试全部通过。
+- CHROMIUM_PATH=/usr/bin/chromium pnpm test:e2e：38 项全部通过，桌面和 Pixel 7 模拟环境实际完成十课程的互动/测验/项目与跨路径去重；保留原课程、账户同步、实验、UI V2、无障碍和小屏降速回归。
+- pnpm build + pnpm test:production：构建与 1 项生产 CSP 冒烟通过，真实 Python 与诚实回退可用。
+- pnpm build:pages + pnpm test:pages：构建与 6 项桌面/手机测试通过，验证子路径刷新、旧记录、真实 Python、新学院课程与跨路径抵扣，且无后端请求。
+- Zod 的既有 Rollup 注解提示仍存在，不影响构建。早期测试发现的旧路由/规划状态假设及 JSON 字段顺序比较已修正测试后回归通过；最终没有失败或跳过的测试。
+
+当前未观察到原有功能回归；自动化与模拟设备不等同真实 Android/完整人工辅助技术验收。内容尚需独立学科评审，进阶/高阶、独立云项目编辑/同步、真实设备连接、任意 Python 编辑器、GitHub Explorer 为后续范围。无有效服务器 provider 凭据，实时 AI 仍未验证；非生成式帮助可用，无学生 API key 要求。
+
+最后 fetch 的 origin/main 为 fb28a6f5f3a6949ac7408489ca7bd56e7c607d83，已包含于开发分支历史。Git fetch 可用，GitHub API 仍返回 Forbidden；PR 与推送结果以最后发布记录为准。网络草案尚不能视为已应用配置，不宣称已创建 PR 或部署成功。
+
+最终安全检查：Gitleaks 对全部 14 个既有提交、待提交索引快照及最终完整应用产物进行脱敏扫描，均未发现泄露。Pages 验证后重新执行普通 pnpm build 成功，本机 dist 恢复完整应用模式；扫描工具/报告与构建产物均不提交。

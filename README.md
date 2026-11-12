@@ -1,6 +1,6 @@
 # NEXUS LAB
 
-Chinese-first interactive technology academy. All ten academies are equally important and share one learning platform; Open Source M01 is the first implementation example, not a central academy. UI V2 provides academy-neutral presentation and shared practice entry points. The full curriculum dependency graph and backend progress migration remain planned. See [product principles](docs/PRODUCT_SPEC.md), [architecture](docs/ARCHITECTURE.md), [roadmap](docs/ROADMAP.md) and [current implementation status](docs/CURRENT_STATUS.md).
+Chinese-first interactive technology academy. All ten academies are equally important and share one learning platform; Open Source M01 is the first implementation example, not a central academy. UI V2 provides academy-neutral presentation and shared practice entry points. Phase 5 adds a validated shared curriculum graph, generic lessons, backward-compatible progress migration, and ten real beginner modules. See the [published content inventory](docs/CONTENT_INVENTORY.md). See [product principles](docs/PRODUCT_SPEC.md), [architecture](docs/ARCHITECTURE.md), [roadmap](docs/ROADMAP.md) and [current implementation status](docs/CURRENT_STATUS.md).
 
 ## Development
 
@@ -25,7 +25,7 @@ CHROMIUM_PATH=/usr/bin/chromium pnpm test:e2e
 
 On other machines, omit `CHROMIUM_PATH` after installing Playwright Chromium with `pnpm exec playwright install chromium`.
 
-Routes: `/` landing, `/welcome` goal selection, `/home`, `/learn`, `/learn/:academy`, `/lab`, `/projects`, `/me`. Unsupported routes show a recovery page. Academy curricula are explicitly marked as planned until implemented. Data is stored locally; no account or secret is needed.
+Routes: `/` landing, `/welcome` goal selection, `/home`, `/learn`, `/learn/:academy`, `/lab`, `/projects`, `/me`. Unsupported routes show a recovery page. Ten beginner modules are available; intermediate and advanced curricula remain explicitly planned. Data is stored locally; no account or secret is needed.
 
 Dependencies: React for rendering, React Router for navigation, Zod for content validation. Vite/TypeScript provide strict compilation, ESLint static checks, Vitest domain tests, and Playwright desktop/mobile functional checks. CSS tokens implement the shared visual system without a styling framework.
 
@@ -33,7 +33,7 @@ See `docs/CURRENT_STATUS.md` for verified scope and limitations. Product specifi
 
 ## Open Source M01
 
-Start at `/learn/opensource/foundations`. Six lessons at `/lesson/:lessonId` contain real authored explanations and quizzes. Correct answers persist progress locally. `/learn/opensource/assessment` creates a license-classification worksheet shown in Projects. Lessons can be revisited freely. Content lives in `content/opensource.ts` and is validated with Zod. Nothing connects to or executes an external repository.
+Start at `/learn/opensource/foundations`. Six lessons at `/lesson/:lessonId` contain real authored explanations and quizzes. Correct answers persist progress locally. `/learn/opensource/assessment` creates a license-classification worksheet shown in Projects. Lessons can be revisited freely. Legacy source material remains in `content/opensource.ts`; the runtime registry is assembled in `content/curriculum.ts` and validated with Zod. Nothing connects to or executes an external repository.
 
 ## Interactive labs
 
@@ -62,7 +62,6 @@ For a built application, run `pnpm build` then `pnpm start`. Full environment va
 静态版保留本机课程进度、Git/逻辑门/公式实验和真实浏览器 Python。注册、登录、服务器进度同步、服务器额度查询及生成式 AI 不可用，界面明确标注且不会发送 API 请求；课程引导为本机非生成式内容。既有 localStorage 键不变，但 GitHub Pages 与本机服务器是不同来源，浏览器不会自动搬迁来源之间的数据。
 
 静态构建验证：`pnpm build:pages`，然后 `CHROMIUM_PATH=/usr/bin/chromium pnpm test:pages`。该测试只启动静态预览，不启动后端，覆盖桌面/移动端子路径、刷新、学习记录、课程帮助和真实 Python 资源加载。后端浏览器回归使用隔离的 3101 端口与临时数据库，不接触正在运行的 3001 开发服务。默认开发代理仍为 3001；测试可通过 `NEXUS_DEV_API_TARGET` 显式指定其他目标。
-
 
 ## UI/UX V2
 

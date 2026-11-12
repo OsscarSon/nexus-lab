@@ -10,7 +10,10 @@ import {
   publicationLabels,
   type CourseEntry,
 } from "../../../content/experience";
-import { lessons } from "../../../content/opensource";
+import { curriculum } from "../../../content/curriculum";
+import { ref } from "../../../packages/curriculum/schema";
+import { courseProgress } from "../../../packages/curriculum/evidence";
+import { readCurriculumProgress } from "./curriculum-storage";
 import { read, write } from "./storage";
 import {
   readLearning,
@@ -129,27 +132,74 @@ export function Home() {
   const visits = readVisits();
   const artifacts = readArtifacts();
   const recent = visits.find((v) => v.kind === "lesson" || v.kind === "lab");
-  const lastLesson = lessons.find((l) => l.id === progress.lastLesson);
+  const lastLesson = curriculum.get("lesson", progress.lastLesson || "");
+  const recentLesson =
+    recent?.kind === "lesson"
+      ? recent.path.split("?")[0].split("/").pop()
+      : lastLesson?.id;
+  const contextId =
+    recent?.kind === "lesson"
+      ? new URLSearchParams(recent.path.split("?")[1] || "").get("course")
+      : undefined;
+  const activeCourse =
+    (contextId && curriculum.get("course", contextId)) ||
+    (goal &&
+    curriculum.get("course", "course." + goal.id + "-starter") &&
+    curriculum
+      .lessons(ref("course", "course." + goal.id + "-starter"))
+      .some((l) => l.id === recentLesson)
+      ? curriculum.get("course", "course." + goal.id + "-starter")
+      : undefined) ||
+    curriculum
+      .list("course")
+      .find(
+        (c) =>
+          c.status === "available" &&
+          curriculum
+            .lessons(ref("course", c.id))
+            .some(
+              (l) =>
+                l.id === recentLesson ||
+                (!recentLesson && progress.completed.includes(l.id)),
+            ),
+      );
+  const lessons = activeCourse
+    ? curriculum.lessons(ref("course", activeCourse.id))
+    : [];
   const nextLesson = lessons.find((l) => !progress.completed.includes(l.id));
+  const courseCompleted = lessons.filter((l) =>
+    progress.completed.includes(l.id),
+  ).length;
+  const courseUrl = activeCourse
+    ? activeCourse.id === "course.opensource-literacy"
+      ? "/learn/opensource/foundations"
+      : "/course/" + activeCourse.id
+    : "/learn";
   const hasLearning = Boolean(
     recent || progress.completed.length || artifacts.length,
   );
   const resume = recent
     ? recent.kind === "lesson" &&
-      progress.completed.includes(recent.path.split("/").pop() || "")
+      progress.completed.includes(
+        recent.path.split("?")[0].split("/").pop() || "",
+      )
       ? {
-          title: nextLesson?.title || "开源素养课程回顾",
+          title: nextLesson?.title || activeCourse?.title || "课程回顾",
           path: nextLesson
-            ? "/lesson/" + nextLesson.id
-            : "/learn/opensource/foundations",
+            ? "/lesson/" +
+              nextLesson.id +
+              (activeCourse ? "?course=" + activeCourse.id : "")
+            : courseUrl,
         }
       : { title: recent.title, path: recent.path }
     : lastLesson || progress.completed.length
       ? {
-          title: nextLesson?.title || "开源素养课程回顾",
+          title: nextLesson?.title || activeCourse?.title || "课程回顾",
           path: nextLesson
-            ? "/lesson/" + nextLesson.id
-            : "/learn/opensource/foundations",
+            ? "/lesson/" +
+              nextLesson.id +
+              (activeCourse ? "?course=" + activeCourse.id : "")
+            : courseUrl,
         }
       : artifacts[0]
         ? { title: artifacts[0].title, path: artifacts[0].source }
@@ -227,15 +277,15 @@ export function Home() {
                   {progress.completed.length ? "已完成课时" : "已验证的练习"}
                   <small>
                     {progress.completed.length
-                      ? "开源素养 M01 · 共 6 节"
+                      ? `${activeCourse?.title || "共享课时"}${activeCourse ? " · 共 " + lessons.length + " 节" : ""}`
                       : "来自实际通过检查的本机记录"}
                   </small>
                 </span>
               </div>
-              {progress.completed.length > 0 && (
+              {activeCourse && progress.completed.length > 0 && (
                 <ProgressBar
                   label="当前课程进度"
-                  value={progress.completed.length}
+                  value={courseCompleted}
                   total={lessons.length}
                 />
               )}
@@ -460,8 +510,18 @@ function CourseCard({
   course: CourseEntry;
   academyId: string;
 }) {
-  const progress = readLearning();
-  const units = c.id === "os-m01" ? progress.completed.length : 0;
+  const course = curriculum.get(
+    "course",
+    c.id === "os-m01" ? "course.opensource-literacy" : c.id,
+  );
+  const stats = course
+    ? courseProgress(
+        ref("course", course.id),
+        readCurriculumProgress(),
+        curriculum,
+      )
+    : undefined;
+  const units = stats?.completed || 0;
   return (
     <article className="card course-card">
       <div className="card-top">
@@ -479,12 +539,8 @@ function CourseCard({
       </div>
       <h3>{c.title}</h3>
       <p>{c.description}</p>
-      {c.id === "os-m01" && (
-        <ProgressBar
-          label="你的课程进度"
-          value={units}
-          total={lessons.length}
-        />
+      {stats && (
+        <ProgressBar label="你的课程进度" value={units} total={stats.total} />
       )}
       <div className="course-actions">
         {c.status === "available" ? (

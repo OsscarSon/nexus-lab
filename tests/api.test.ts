@@ -1,3 +1,4 @@
+import { evidenceFor } from "./fixtures/curriculum-proofs";
 import { afterEach, describe, it, expect } from "vitest";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -368,4 +369,68 @@ it("safely upgrades legacy SQLite rows with a byte-preserving backup and support
   expect(
     s.db.prepare("SELECT data FROM progress_backups WHERE user_id=?").get(id),
   ).toBeUndefined();
+});
+
+it("grades new academy evidence server-side, rejects forged completion and shares canonical content across paths", async () => {
+  const s = store();
+  const { call } = await listen(s);
+  const cookie = await register(call);
+  const ctx = await (await call("/api/lesson/security-permissions")).json();
+  expect(ctx.lesson.title).toContain("最小权限");
+  const r = await (
+    await call(
+      "/api/mentor/chat",
+      "POST",
+      {
+        mode: "hint",
+        lessonId: "security-permissions",
+        userMessage: "给一个提示",
+      },
+      cookie,
+    )
+  ).json();
+  expect(r.providerKind).toBe("fallback");
+  expect(r.answer).toContain("read:temperature");
+  const fake = {
+    version: 2,
+    evidence: [
+      {
+        kind: "lesson",
+        id: "security-permissions",
+        version: 1,
+        source: "assessment",
+        completedAt: "2026-11-13T00:00:00.000Z",
+        proof: {
+          exercise: {},
+          answers: { "assessment.security-permissions": 1 },
+        },
+      },
+    ],
+    unresolved: [],
+  };
+  expect((await call("/api/progress/v2", "POST", fake, cookie)).status).toBe(
+    400,
+  );
+  const valid = { ...fake, evidence: [evidenceFor("shared-api-basics")] };
+  expect((await call("/api/progress/v2", "POST", valid, cookie)).status).toBe(
+    200,
+  );
+  expect(
+    (
+      await call(
+        "/api/progress",
+        "POST",
+        { version: 1, completed: ["shared-api-basics"] },
+        cookie,
+      )
+    ).status,
+  ).toBe(400);
+  const stored = await (
+    await call("/api/progress/v2", "GET", undefined, cookie)
+  ).json();
+  expect(
+    stored.progress.evidence.filter(
+      (e: { id: string }) => e.id === "shared-api-basics",
+    ),
+  ).toHaveLength(1);
 });

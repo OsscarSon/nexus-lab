@@ -32,7 +32,11 @@ test("new learner has a neutral start and all ten academy overviews", async ({
   }
   await page.goto("/learn/future");
   await expect(page.locator(".course-card .button")).toHaveCount(0);
-  await page.getByRole("link", { name: "查看说明" }).first().click();
+  await page
+    .locator(".curriculum-level")
+    .filter({ has: page.getByRole("heading", { name: "高阶", exact: true }) })
+    .getByRole("link", { name: "查看说明" })
+    .click();
   await expect(page.getByText("规划中 · 尚未开放")).toBeVisible();
   await expect(page.getByRole("link", { name: "进入课程" })).toHaveCount(0);
 });
@@ -190,7 +194,10 @@ test("legacy progress without visit metadata still resumes, and Python-only lear
   await page.goto("/home");
   await expect(
     page.getByRole("link", { name: "继续学习", exact: true }),
-  ).toHaveAttribute("href", "/lesson/os-permissions");
+  ).toHaveAttribute(
+    "href",
+    "/lesson/os-permissions?course=course.opensource-literacy",
+  );
   expect(
     await page.evaluate(
       () => JSON.parse(localStorage.getItem("nexus-progress")!).completed,

@@ -72,6 +72,27 @@ export function validateCatalog(input: unknown): Catalog {
   for (const e of catalog.entities) {
     references(e).forEach(check);
     edges.set(key(e), children(e).map(key));
+    if (e.kind === "lesson") {
+      for (const b of e.blocks) {
+        if (
+          b.kind === "permissions" &&
+          b.expected.some((value) => !b.options.includes(value))
+        )
+          throw Error("Unanswerable permissions exercise");
+        if (
+          b.kind === "classification" &&
+          b.claims.some((c) => !b.categories.includes(c.category))
+        )
+          throw Error("Unanswerable classification exercise");
+      }
+    }
+    if (
+      e.kind === "lab" &&
+      e.status === "available" &&
+      e.runtime === "python" &&
+      !e.expectedOutput
+    )
+      throw Error("Published Python lab lacks expected output");
     if (e.status === "available") {
       if (
         ["path", "course", "module"].includes(e.kind) &&
@@ -95,6 +116,11 @@ export function validateCatalog(input: unknown): Catalog {
   for (const d of catalog.dependencies) {
     const from = check(d.from),
       to = check(d.to);
+    if (
+      d.kind !== "related" &&
+      [from.kind, to.kind].some((k) => k === "academy" || k === "topic")
+    )
+      throw Error("Prerequisites must reference assessable learning content");
     if (d.kind !== "related") edges.get(key(from))!.push(key(to));
     if (
       d.kind === "required" &&

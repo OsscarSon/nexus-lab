@@ -102,3 +102,25 @@ describe("versioned shared catalog", () => {
     expect(() => validateCatalog(c)).toThrow("empty");
   });
 });
+it("rejects non-assessable prerequisites and unanswerable authored exercises", () => {
+  const c = fresh();
+  c.dependencies.push({
+    from: ref("lesson", "os-source"),
+    to: ref("topic", "topic.git"),
+    kind: "required",
+    rationale: "bad hard gate",
+  });
+  expect(() => validateCatalog(c)).toThrow("assessable");
+  const bad = fresh();
+  const l = bad.entities.find((e) => e.kind === "lesson")!;
+  if (l.kind === "lesson")
+    l.blocks = [
+      {
+        kind: "permissions",
+        id: "bad",
+        options: ["read", "write"],
+        expected: ["admin"],
+      },
+    ];
+  expect(() => validateCatalog(bad)).toThrow("Unanswerable");
+});

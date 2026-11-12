@@ -46,6 +46,10 @@ export function Course() {
   const ledger = readCurriculumProgress();
   const lessons = curriculum.lessons(ref("course", course.id));
   const progress = courseProgress(ref("course", course.id), ledger, curriculum);
+  const checkpoints = curriculum
+    .requirements(ref("course", course.id))
+    .filter((r) => r.kind === "assessment")
+    .map((r) => curriculum.get("assessment", r.id)!);
   const academy = curriculum
     .list("path")
     .find((p) => p.courseRefs.some((c) => c.id === course.id))?.academyRefs[0];
@@ -110,6 +114,20 @@ export function Course() {
           <Icon name="arrow" size={18} />
         </Link>
       ))}
+      {checkpoints.length > 0 && (
+        <section className="card">
+          <h2>模块测评</h2>
+          {checkpoints.map((a) => (
+            <Link
+              className="text-link"
+              key={a.id}
+              to={"/assessment/" + a.id + "?course=" + course.id}
+            >
+              {a.title} →
+            </Link>
+          ))}
+        </section>
+      )}
       {course.id === "course.opensource-literacy" && (
         <Link className="button" to="/learn/opensource/assessment">
           完成模块检查 →
@@ -369,7 +387,10 @@ function LessonBody({
                         key={b.id}
                         block={b}
                         onEvidence={(value) => {
-                          setExercises({ ...exercises, [b.id]: value });
+                          setExercises((previous) => ({
+                            ...previous,
+                            [b.id]: value,
+                          }));
                           setFeedback("");
                           setPassed(false);
                         }}
@@ -553,6 +574,80 @@ export function Assessment() {
       </button>
       <p role="status">{message}</p>
       <Link to="/projects">查看学习成果 →</Link>
+    </section>
+  );
+}
+
+export function GenericAssessment() {
+  const { assessmentId } = useParams();
+  const [params] = useSearchParams();
+  const assessment = curriculum.get("assessment", assessmentId || "");
+  const [answer, setAnswer] = useState(-1);
+  const [feedback, setFeedback] = useState("");
+  if (!assessment || assessment.status !== "available")
+    return (
+      <>
+        <h1>测评尚未开放</h1>
+        <Link to="/learn">返回课程</Link>
+      </>
+    );
+  const course = params.get("course");
+  return (
+    <section className="prose">
+      <PageIntro eyebrow="CHECK YOUR UNDERSTANDING" title={assessment.title}>
+        完成自动检查，保存一份独立的测评证据。
+      </PageIntro>
+      <fieldset className="card answers">
+        <legend>{assessment.question}</legend>
+        {assessment.options.map((option, i) => (
+          <label key={option}>
+            <input
+              type="radio"
+              name="assessment"
+              checked={answer === i}
+              onChange={() => {
+                setAnswer(i);
+                setFeedback("");
+              }}
+            />
+            {option}
+          </label>
+        ))}
+      </fieldset>
+      <button
+        disabled={answer < 0}
+        onClick={() => {
+          if (answer !== assessment.correct) {
+            setFeedback("再想一想，尚未通过测评。");
+            return;
+          }
+          const saved = saveEvidence({
+            kind: "assessment",
+            id: assessment.id,
+            version: assessment.version,
+            source: "assessment",
+            completedAt: new Date().toISOString(),
+            proof: { answer },
+          });
+          setFeedback(
+            assessment.explanation +
+              (saved ? " 已保存测评证据。" : " 存储不可用，未保存。"),
+          );
+        }}
+      >
+        检查测评
+      </button>
+      <p role="status">{feedback}</p>
+      <Link
+        className="text-link"
+        to={
+          course && curriculum.get("course", course)
+            ? "/course/" + course
+            : "/learn"
+        }
+      >
+        返回课程 →
+      </Link>
     </section>
   );
 }

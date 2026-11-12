@@ -1,3 +1,4 @@
+import { curriculum } from "../content/curriculum";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { academies } from "../content/catalog";
 import {
@@ -38,6 +39,10 @@ describe("equal academy presentation", () => {
     for (const a of academies)
       for (const c of academyCourses(a.id)) {
         if (c.status !== "available") expect("route" in c).toBe(false);
+        else if (c.route.startsWith("/course/"))
+          expect(
+            curriculum.get("course", c.route.slice("/course/".length))?.status,
+          ).toBe("available");
         else
           expect(c.route).toMatch(
             /^\/(lab\/(git|logic|python|spreadsheet)|learn\/opensource\/foundations)$/,

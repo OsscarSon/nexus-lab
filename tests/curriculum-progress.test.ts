@@ -209,3 +209,38 @@ it("requires actual exercise proof as well as quiz answers for a generic new les
     ),
   ).toBe(true);
 });
+
+it("counts an explicit module assessment instead of silently ignoring it", () => {
+  const c = baseCatalog();
+  const module = c.entities.find(
+    (e) => e.kind === "module" && e.id === "os-m01",
+  )!;
+  if (module.kind !== "module") throw Error("fixture");
+  module.assessmentRefs = [ref("assessment", "assessment.os-source")];
+  const registry = new CurriculumRegistry(c);
+  const ledger = { ...emptyLedger(), evidence: [answer()] };
+  expect(
+    courseProgress(
+      ref("course", "course.opensource-literacy"),
+      ledger,
+      registry,
+    ),
+  ).toMatchObject({ total: 7, completed: 1 });
+  const checkpoint: Evidence = {
+    kind: "assessment",
+    id: "assessment.os-source",
+    version: 1,
+    source: "assessment",
+    completedAt: null,
+    proof: { answer: 1 },
+  };
+  expect(validateEvidence(checkpoint, registry)).toBe(true);
+  ledger.evidence.push(checkpoint);
+  expect(
+    courseProgress(
+      ref("course", "course.opensource-literacy"),
+      ledger,
+      registry,
+    ).completed,
+  ).toBe(2);
+});

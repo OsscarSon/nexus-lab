@@ -1,3 +1,4 @@
+import { completeLesson } from "../helpers/complete-lesson";
 import { choosePanel } from "../helpers/panels";
 import { test, expect } from "@playwright/test";
 test("subpath routes survive refresh and retain learning progress without backend requests", async ({
@@ -72,4 +73,27 @@ test("real Python assets and worker run under the project base path", async ({
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+});
+
+test("new academy lesson and shared path credit work offline from backend on Pages", async ({
+  page,
+}) => {
+  const api: string[] = [];
+  page.on("request", (r) => {
+    if (/\/api(?:\/|$)/.test(new URL(r.url()).pathname)) api.push(r.url());
+  });
+  await completeLesson(page, "shared-api-basics", "course.web-starter", "./#/");
+  await page.goto("./#/course/course.web-starter");
+  await expect(
+    page.getByRole("progressbar", { name: "课程完成进度" }),
+  ).toHaveAttribute("value", "1");
+  await page.goto("./#/course/course.workspace-starter");
+  await expect(
+    page.getByRole("progressbar", { name: "课程完成进度" }),
+  ).toHaveAttribute("value", "1");
+  await page.reload();
+  await expect(
+    page.getByRole("progressbar", { name: "课程完成进度" }),
+  ).toHaveAttribute("value", "1");
+  expect(api).toEqual([]);
 });

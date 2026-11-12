@@ -2,14 +2,18 @@ import { PageIntro, Badge, WorkspacePanels } from "./components/ui";
 import { Mentor } from "./mentor";
 import { Icon } from "./components/icon";
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { pythonSamples } from "../../../content/python";
 import { write } from "./storage";
 export default function PythonLab() {
-  const [sampleId, setSampleId] = useState("variables");
+  const [params] = useSearchParams();
+  const initial =
+    pythonSamples.find((s) => s.id === params.get("sample")) ||
+    pythonSamples[0];
+  const [sampleId, setSampleId] = useState(initial.id);
   const [panel, setPanel] = useState("work");
   const sample = pythonSamples.find((s) => s.id === sampleId)!;
-  const [input, setInput] = useState("7");
+  const [input, setInput] = useState(String(initial.input));
   const [state, setState] = useState<
     "idle" | "loading" | "ready" | "running" | "error"
   >("idle");

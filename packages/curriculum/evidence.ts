@@ -168,7 +168,7 @@ export function checkInteraction(
 }
 export const evidenceSchema = z
   .object({
-    kind: z.enum(["lesson", "lab", "project"]),
+    kind: z.enum(["lesson", "lab", "project", "assessment"]),
     id: z.string().max(120),
     version: z.number().int().positive(),
     completedAt: z.string().datetime().nullable(),
@@ -222,6 +222,12 @@ export function validateEvidence(e: Evidence, registry: CurriculumRegistry) {
   if (e.kind === "lesson" && target.kind === "lesson") {
     if (e.source === "legacy") return target.legacyCompatible;
     return e.source === "assessment" && gradeLesson(target, e.proof, registry);
+  }
+  if (e.kind === "assessment" && target.kind === "assessment") {
+    const p = object(e.proof);
+    return (
+      e.source === "assessment" && p.success && p.data.answer === target.correct
+    );
   }
   if (e.kind === "lab")
     return e.source === "lab-import" && checkLab(registry, e.id, e.proof);
@@ -346,7 +352,10 @@ export function courseProgress(
   const refs = registry.requirements(r);
   const completed = completedKeys(ledger, registry);
   const requirements = refs.filter(
-    (item) => item.kind === "lesson" || item.kind === "lab",
+    (item) =>
+      item.kind === "lesson" ||
+      item.kind === "lab" ||
+      item.kind === "assessment",
   );
   const count = requirements.filter((item) => completed.has(key(item))).length;
   return {

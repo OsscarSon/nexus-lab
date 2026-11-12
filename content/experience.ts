@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { curriculum } from "./curriculum";
 import { academies } from "./catalog";
 import { academyPlans } from "./academy-plans";
 export { academyPlans };
@@ -85,16 +86,32 @@ export function academyCourses(id: string): CourseEntry[] {
       status: "planned",
     },
   ];
-  if (id === "opensource")
+  const starter = curriculum.get("course", "course." + id + "-starter");
+  if (starter?.status === "available")
     courses[0] = {
       ...courses[0],
+      id: starter.id,
+      title: starter.title,
+      description: starter.description,
+      status: "available",
+      route: "/course/" + starter.id,
+      minutes: curriculum
+        .lessons({ kind: "course", id: starter.id, version: starter.version })
+        .reduce((sum, l) => sum + l.estimatedMinutes, 0),
+    };
+  else if (starter?.status === "in-development")
+    courses[0] = { ...courses[0], status: "in-development" };
+  if (id === "opensource")
+    courses.push({
       id: "os-m01",
       title: "开源素养 M01",
+      description: "保留原六课、检查题与决策工作表。",
+      level: "beginner",
+      kind: "course",
       status: "available",
       route: "/learn/opensource/foundations",
       minutes: 30,
-      description: "六节短课、检查题与开源决策工作表。",
-    };
+    });
   const practices: Record<string, string[]> = {
     programming: ["python", "git"],
     ai: ["python"],

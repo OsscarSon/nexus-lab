@@ -4,18 +4,18 @@
 
 面向初学者，从理解技术到制作可独立验证的作品。平台由十个地位平等的学院组成，不设主学院、次学院或必须经过的中心学院。
 
-| 学院 ID（保持现有值） | 学院 | 英文名称 |
-| --- | --- | --- |
-| `programming` | 编程学院 | Programming |
-| `ai` | 人工智能 | Artificial Intelligence |
-| `games` | 游戏开发 | Game Development |
-| `engineering` | 计算机工程 | Computer Engineering |
-| `web` | 网站与云端 | Web & Cloud |
-| `security` | 网络与安全 | Networking & Cybersecurity |
-| `robotics` | 机器人与物联网 | Robotics & IoT |
-| `future` | 未来科技 | Future Technology |
-| `workspace` | 效率与自动化 | Workspace & Automation |
-| `opensource` | 开源学院 | Open Source |
+| 学院 ID（保持现有值） | 学院           | 英文名称                   |
+| --------------------- | -------------- | -------------------------- |
+| `programming`         | 编程学院       | Programming                |
+| `ai`                  | 人工智能       | Artificial Intelligence    |
+| `games`               | 游戏开发       | Game Development           |
+| `engineering`         | 计算机工程     | Computer Engineering       |
+| `web`                 | 网站与云端     | Web & Cloud                |
+| `security`            | 网络与安全     | Networking & Cybersecurity |
+| `robotics`            | 机器人与物联网 | Robotics & IoT             |
+| `future`              | 未来科技       | Future Technology          |
+| `workspace`           | 效率与自动化   | Workspace & Automation     |
+| `opensource`          | 开源学院       | Open Source                |
 
 表格次序仅用于目录稳定展示，不代表重要性或开发优先级。开源 M01 是学习引擎的首个实现案例，不是平台中心、共享课程的所有者或其他学院的必修入口。实现较早、内容较多不赋予更高地位；地位平等也不代表十个学院当前已有相同数量的可用课程。
 
@@ -50,13 +50,13 @@ Git、GitHub、Python、API 和云部署等是平台共享主题，不属于某�
 
 ## 发布状态与学习状态分开
 
-| 维度 | 状态 | 展示规则 |
-| --- | --- | --- |
-| 内容发布 | `planned` 规划中 | 目标/路线图可查看，不提供伪造的开始课程按钮 |
-| 内容发布 | `in-development` 开发中 | 不宣称稳定可用或课程已经完成 |
-| 内容发布 | `available` 可学习 | 已实现并通过该内容所需的运行与测评检查；验证范围可查 |
-| 内容发布 | `archived` 已归档 | 保留历史证据与兼容入口，说明替代版本 |
-| 学习者进度 | `not-started` / `in-progress` / `completed` | 仅由该学习者的真实记录和课程结业规则得出 |
+| 维度       | 状态                                        | 展示规则                                             |
+| ---------- | ------------------------------------------- | ---------------------------------------------------- |
+| 内容发布   | `planned` 规划中                            | 目标/路线图可查看，不提供伪造的开始课程按钮          |
+| 内容发布   | `in-development` 开发中                     | 不宣称稳定可用或课程已经完成                         |
+| 内容发布   | `available` 可学习                          | 已实现并通过该内容所需的运行与测评检查；验证范围可查 |
+| 内容发布   | `archived` 已归档                           | 保留历史证据与兼容入口，说明替代版本                 |
+| 学习者进度 | `not-started` / `in-progress` / `completed` | 仅由该学习者的真实记录和课程结业规则得出             |
 
 “课程开发已完成”与“学习者已完成课程”不是同一件事。学院不得仅用一个布尔值代表所有课程状态；某个实验可用不意味着整个学院课程完整。专家内容审核与技术功能验证也要分别披露。
 
@@ -77,3 +77,9 @@ Git、GitHub、Python、API 和云部署等是平台共享主题，不属于某�
 ## 路线图与验收
 
 [ROADMAP.md](ROADMAP.md) 是后续工作排序与验收依据；[../tasks/PHASES.md](../tasks/PHASES.md) 保留早期阶段执行记录。后续优先级根据学习者需求、课程依赖、可访问性、资源与可验证交付决定，不因开源学院最先实现而持续优先。
+
+## Phase 5 发布范围
+
+十学院各发布一个真正可完成的初学模块；课程范围、规范 ID 与互动边界以 [CONTENT_INVENTORY.md](CONTENT_INVENTORY.md) 为准。初阶不再整体标为规划中；进阶/高阶仍需独立内容制作与审查，不因首批模块发布而声称学院全部完成。
+
+同一共享课时在不同路径完成抵扣一次；项目成果必须满足自身课程要求。自动检查表示本课量规通过，不表示获得专业认证。AI 提示练习是确定性结构检查，传感器练习是明确标注的模型；只有 Python 运行时输出才称为实际 Python 执行。没有 provider 时 Mentor 清楚显示非生成式帮助。

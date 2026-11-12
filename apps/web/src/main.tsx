@@ -28,7 +28,20 @@ import { Account, AISettings } from "./account";
 import "./style.css";
 import "./ui-v2.css";
 import { LabDirectory, LabRoute } from "./labs";
-import { Course, Lesson, Assessment } from "./learning";
+const Course = React.lazy(() =>
+  import("./learning").then((module) => ({ default: module.Course })),
+);
+const Lesson = React.lazy(() =>
+  import("./learning").then((module) => ({ default: module.Lesson })),
+);
+const Assessment = React.lazy(() =>
+  import("./learning").then((module) => ({ default: module.Assessment })),
+);
+const GenericAssessment = React.lazy(() =>
+  import("./learning").then((module) => ({
+    default: module.GenericAssessment,
+  })),
+);
 const nav = [
   ["/home", "home", "首页", "Home"],
   ["/learn", "learn", "学习", "Learn"],
@@ -199,35 +212,47 @@ function App() {
         {STATIC_DEPLOYMENT && <p className="notice">{STATIC_NOTICE}</p>}
         <main id="main" tabIndex={-1}>
           <Boundary>
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/welcome" element={<Welcome />} />
-              <Route path="/home" element={<Home />} />
-              <Route path="/learn" element={<Learn />} />
-              <Route path="/learn/:academy" element={<Academy />} />
-              <Route
-                path="/learn/opensource/foundations"
-                element={<Course />}
-              />
-              <Route
-                path="/learn/opensource/assessment"
-                element={<Assessment />}
-              />
-              <Route path="/lesson/:lessonId" element={<Lesson />} />
-              <Route path="/course/:courseId" element={<Course />} />
-              <Route path="/lab" element={<LabDirectory />} />
-              <Route path="/lab/:labId" element={<LabRoute />} />
-              <Route path="/opensource/git-playground" element={<LabRoute />} />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/projects/:projectId" element={<ProjectDetail />} />
-              <Route
-                path="/learn/:academy/curriculum/:courseId"
-                element={<CourseDetails />}
-              />
-              <Route path="/me" element={<Account />} />
-              <Route path="/settings/ai" element={<AISettings />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <React.Suspense fallback={<p role="status">正在加载学习内容…</p>}>
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/welcome" element={<Welcome />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/learn" element={<Learn />} />
+                <Route path="/learn/:academy" element={<Academy />} />
+                <Route
+                  path="/learn/opensource/foundations"
+                  element={<Course />}
+                />
+                <Route
+                  path="/learn/opensource/assessment"
+                  element={<Assessment />}
+                />
+                <Route path="/lesson/:lessonId" element={<Lesson />} />
+                <Route path="/course/:courseId" element={<Course />} />
+                <Route
+                  path="/assessment/:assessmentId"
+                  element={<GenericAssessment />}
+                />
+                <Route path="/lab" element={<LabDirectory />} />
+                <Route path="/lab/:labId" element={<LabRoute />} />
+                <Route
+                  path="/opensource/git-playground"
+                  element={<LabRoute />}
+                />
+                <Route path="/projects" element={<Projects />} />
+                <Route
+                  path="/projects/:projectId"
+                  element={<ProjectDetail />}
+                />
+                <Route
+                  path="/learn/:academy/curriculum/:courseId"
+                  element={<CourseDetails />}
+                />
+                <Route path="/me" element={<Account />} />
+                <Route path="/settings/ai" element={<AISettings />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </React.Suspense>
           </Boundary>
           <footer>
             <span>NEXUS LAB</span> 从好奇到创造。

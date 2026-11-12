@@ -2,7 +2,7 @@ import { STATIC_DEPLOYMENT, STATIC_NOTICE } from "./deployment";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "./api";
-import { getProgress } from "./learning";
+import { compatibleProgress as getProgress } from "./curriculum-storage";
 import { read } from "./storage";
 import { academies } from "../../../content/catalog";
 import { type Ledger } from "../../../packages/curriculum/evidence";
