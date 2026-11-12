@@ -1,3 +1,4 @@
+import { STATIC_DEPLOYMENT } from "./deployment";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { fallback } from "../../../packages/ai-gateway/fallback";
@@ -23,6 +24,7 @@ const reasons: Record<string, string> = {
   "provider-unavailable": "AI 服务暂不可用",
   "provider-metering-unavailable": "AI 计量无法验证，已停止生成式调用",
   offline: "网络或服务不可用",
+  "static-deployment": "GitHub Pages 静态版没有生成式 AI 后端",
 };
 export function Mentor({ lessonId }: { lessonId?: string }) {
   const [open, setOpen] = useState(false);
@@ -44,9 +46,9 @@ export function Mentor({ lessonId }: { lessonId?: string }) {
         <div id="mentor-content" className="card">
           <h2>学习助手 · Mentor</h2>
           <p>
-            默认提供课程引导，明确标注非生成式内容。平台 AI
-            仅在启用并登录后可用，不需要你的 API key。问题将发送至平台后端；启用
-            AI 时会发送给配置的服务商，请勿输入私人信息或密钥。
+            {STATIC_DEPLOYMENT
+              ? "静态版仅提供预先编写的非生成式课程引导，不会发送问题或密钥给服务器。账户与生成式 AI 不可用。"
+              : "默认提供课程引导，明确标注非生成式内容。平台 AI 仅在启用并登录后可用，不需要你的 API key。问题将发送至平台后端；启用 AI 时会发送给配置的服务商，请勿输入私人信息或密钥。"}
           </p>
           <label>
             教学模式
@@ -76,6 +78,11 @@ export function Mentor({ lessonId }: { lessonId?: string }) {
               onClick={async () => {
                 setBusy(true);
                 const request = { mode, lessonId, userMessage: message };
+                if (STATIC_DEPLOYMENT) {
+                  setResponse(fallback(request, "static-deployment"));
+                  setBusy(false);
+                  return;
+                }
                 try {
                   setResponse(
                     await api<MentorResponse>(

@@ -78,3 +78,13 @@ Playwright starts isolated test processes/databases and exercises desktop and mo
 Demo paths: landing → goal → Open Source course → answer quizzes → module worksheet; Lab → Git challenge / logic truth table; Lab → Python → load → execute each sample; Lab → spreadsheet → change cell values → check formula; lesson → learning assistant → select any teaching mode; Me → optional account → sync in a second browser context.
 
 GitHub Actions workflow is included for these commands, but no remote CI run or public deployment has been performed in this session. Heavy Python assets and views load on demand; no service worker/offline app installation is implemented. Already loaded course text remains available while the page is open offline; cold offline reload is not promised.
+
+## GitHub Pages 静态前端部署
+
+仓库 `OsscarSon/nexus-lab` 的项目站点使用 `/nexus-lab/`。`pnpm build:pages` 显式选择 Vite `pages` 模式：资源 base 为该子路径，页面使用 HashRouter，Python worker/运行时资源由 base 和 worker URL 推导。默认模式的根路径、BrowserRouter、后端与 3001 API 代理保持不变。可用 `NEXUS_DEV_API_TARGET` 覆盖开发代理以进行隔离测试；后端回归使用 3101 临时实例。
+
+Pages 工作流仅上传前端 `dist/` 并使用 Pages/OIDC 部署权限，不调用 `pnpm start`、不运行 SQLite、也不引用平台 AI 密钥。静态版将注册/登录/服务端同步/用量/生成式 AI 标为不可用，隐藏账户提交表单并拦截 API 调用；课程帮助直接读取已编写的本机教学内容。不要把 Vite 公共变量用于秘密。数据键不迁移，来源之间的 localStorage 不共享。
+
+运行 `pnpm build:pages` 后执行 `CHROMIUM_PATH=/usr/bin/chromium pnpm test:pages`。切换回完整应用验证时，重新执行 `pnpm build` 和原有测试。两种构建输出同一 `dist/`，必须用对应模式的产物验证。
+
+首次启用可能需要仓库管理员在 Settings → Pages 选择 GitHub Actions，并确认 Actions 与 github-pages 环境规则允许 main 部署。工作流提交、Git 推送、远端工作流成功、公开站点实际可用是四个不同状态；未验证时不能声称部署成功。不要为更新 Pages 强推 main 或删除任何分支。

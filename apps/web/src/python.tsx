@@ -45,7 +45,7 @@ export default function PythonLab() {
     }
     setState("loading");
     setFeedback("首次加载约 12 MB，本地 WebAssembly Python，不上传输入。");
-    const w = new Worker("/python-worker.js");
+    const w = new Worker(`${import.meta.env.BASE_URL}python-worker.js`);
     worker.current = w;
     deadline(45000);
     w.onmessage = ({ data }) => {

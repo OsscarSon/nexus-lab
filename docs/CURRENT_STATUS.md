@@ -1,6 +1,6 @@
 # Current status
 
-Phases 0–3 are implemented and verified. Phase 4 account/sync, gateway controls and non-generative assistance are implemented and verified locally; live AI provider validation is blocked by absent server credentials/configuration. No public deployment, remote CI run or environment publication has been verified. Development branch: `development/phases-0-4`; stable branches have not been overwritten.
+Phases 0–3 are implemented and verified. Phase 4 account/sync, gateway controls and non-generative assistance are implemented and verified locally; live AI provider validation is blocked by absent server credentials/configuration. No public deployment, remote CI run or environment publication has been verified. Initial implementation branch: `development/phases-0-4`. The publication preparation branch is `develop/nexus-academy`; the requested main update must preserve this history through a normal merge, never a force-push.
 
 ## 十个学院平等：本轮文档更新与真实实现边界
 
@@ -102,3 +102,18 @@ Deferred limitations: no BYOK/local generative model, streaming, password recove
 本轮只修改 README、AGENTS、PRODUCT_SPEC、ARCHITECTURE、UI_SPEC、CURRENT_STATUS、历史 PHASES，并新增 ROADMAP。没有改动应用代码、课程内容、依赖/锁文件、学习数据格式或数据库；没有运行迁移。
 
 `pnpm typecheck`、`pnpm lint`、`pnpm test`（41 项）及 `pnpm build` 全部通过；`git diff --check` 通过。构建仍仅有既有 Zod 注解警告。已检查本轮文档的相对链接与十学院覆盖。未重复运行浏览器或实时 AI 检查，不将历史 20 项浏览器结果计作本轮新执行结果。
+
+
+## GitHub main 与 Pages 发布准备
+
+已核对初始工作区干净及既有六个开发提交。原环境不存在 `develop/nexus-academy`，因此从完整的 `development/phases-0-4` 创建该分支，原分支保留。已获取 `OsscarSon/nexus-lab` 远端 main，初次比较为开发成果的祖先；最终合并前仍需重新获取，使用保留历史的 merge 并正常推送，任何远端推进必须合并处理，不允许强推覆盖。
+
+新增独立 `pages` 构建模式，Vite base 为 `/nexus-lab/`，使用 HashRouter 与按 base 定位的真实 Python worker/运行时。默认开发/完整应用仍使用 `/`、BrowserRouter 和原有 3001 API 代理。浏览器回归现在使用隔离的 3101 API 与临时数据库，保留正在运行的开发服务和用户数据。
+
+静态版明确提示注册/登录、服务端进度同步、用量查询和生成式 AI 不可用；不显示账户提交表单、不调用 API，本机课程引导标注非生成式。原有数据键未修改，Pages 与本机来源不自动共享 localStorage。`.github/workflows/pages.yml` 在 main 推送/手动触发时检查、构建、运行静态浏览器测试，只发布前端 dist。Node 后端与服务端密钥不会作为 Pages 服务部署。
+
+本轮已执行：`pnpm lint`、`pnpm typecheck`、`pnpm test`（41 项）、`pnpm build`、`pnpm test:e2e`（20 项桌面/移动回归）、`pnpm test:production`（1 项完整应用生产冒烟）、再次 `pnpm build:pages` 与 `pnpm test:pages`（4 项静态桌面/移动测试），全部通过。静态测试验证子路径导航/刷新、持久化记录、无后端请求、键盘跳转及真实 Python 输出。构建仅有既有 Zod 注解警告。
+
+Gitleaks 使用经过官方发布校验和核验的版本扫描全部 8 个既有提交、最终待提交文件及 Pages 静态产物，三次扫描均未发现泄露。扫描工具和报告留在忽略的 .cache 中，不提交。GitHub API 读取曾返回 Forbidden，Git fetch 正常；不能据此假定 Git push 成功或失败。推送结果以真实 Git 操作及远端 SHA 为准。
+
+Pages 代码和工作流准备就绪不代表线上部署成功。首次部署可能需要在仓库 Settings → Pages 将 Source 设为 GitHub Actions，并允许 Actions 与 github-pages 环境。只有远端工作流成功及站点验证后才能宣称部署完成；最终 Git 推送与站点验证状态见本次发布报告。

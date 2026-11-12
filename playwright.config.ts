@@ -15,13 +15,15 @@ export default defineConfig({
     {
       command: "pnpm dev",
       url: "http://127.0.0.1:5173",
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer: false,
+      env: { NEXUS_DEV_API_TARGET: "http://127.0.0.1:3101" },
     },
     {
       command: "pnpm start",
-      url: "http://127.0.0.1:3001/api/health",
+      url: "http://127.0.0.1:3101/api/health",
       reuseExistingServer: false,
       env: {
+        PORT: "3101",
         NEXUS_DB_PATH: `.cache/e2e-${Date.now()}.sqlite`,
         NEXUS_AI_ENABLED: "false",
       },

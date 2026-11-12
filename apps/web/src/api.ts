@@ -1,3 +1,4 @@
+import { STATIC_DEPLOYMENT } from "./deployment";
 export class ApiError extends Error {
   constructor(
     readonly status: number,
@@ -11,6 +12,8 @@ export async function api<T>(
   method = "GET",
   data?: unknown,
 ): Promise<T> {
+  if (STATIC_DEPLOYMENT)
+    throw new ApiError(503, "GitHub Pages 静态版不提供后端服务");
   const response = await fetch(path, {
     method,
     credentials: "same-origin",

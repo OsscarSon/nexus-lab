@@ -15,7 +15,9 @@
     "format": "prettier --write apps content packages scripts tests *.ts *.js *.json *.yaml",
     "dev:api": "node --use-env-proxy --import tsx --watch apps/api/server.ts",
     "start": "node --use-env-proxy --import tsx apps/api/server.ts",
-    "test:production": "playwright test --config playwright.production.config.ts"
+    "test:production": "playwright test --config playwright.production.config.ts",
+    "build:pages": "node scripts/prepare-python.mjs && tsc --noEmit && vite build --mode pages",
+    "test:pages": "playwright test --config playwright.pages.config.ts"
   },
   "dependencies": {
     "pyodide": "0.29.3",

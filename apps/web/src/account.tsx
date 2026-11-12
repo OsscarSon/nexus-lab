@@ -1,3 +1,4 @@
+import { STATIC_DEPLOYMENT, STATIC_NOTICE } from "./deployment";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { api } from "./api";
@@ -15,6 +16,10 @@ export function Account() {
   const [message, setMessage] = useState("");
   const [completed, setCompleted] = useState(getProgress().completed.length);
   useEffect(() => {
+    if (STATIC_DEPLOYMENT) {
+      setLoading(false);
+      return;
+    }
     api<{ user: User | null }>("/api/auth/session")
       .then((r) => setUser(r.user))
       .catch(() => setMessage("账户服务暂不可用，本地课程与实验仍可使用。"))
@@ -52,7 +57,16 @@ export function Account() {
         </p>
         <Link to="/welcome">重新选择方向 →</Link>
       </div>
-      {loading ? (
+      {STATIC_DEPLOYMENT ? (
+        <div className="card">
+          <h2>本机学习模式</h2>
+          <p>{STATIC_NOTICE}</p>
+          <p>
+            账户功能需要单独部署后端；此处不会向不存在的 API
+            发送请求，也不会更改已有本机记录。
+          </p>
+        </div>
+      ) : loading ? (
         <p role="status">正在读取账户…</p>
       ) : user ? (
         <div className="card">
@@ -200,6 +214,7 @@ export function AISettings() {
   } | null>(null);
   const [error, setError] = useState("");
   useEffect(() => {
+    if (STATIC_DEPLOYMENT) return;
     api<NonNullable<typeof data>>("/api/mentor/usage")
       .then(setData)
       .catch(() => setError("暂时无法读取 AI 状态。课程引导仍可使用。"));
@@ -210,7 +225,9 @@ export function AISettings() {
       <h1>透明的帮助，安心地学习。</h1>
       <div className="card">
         <h2>学习助手</h2>
-        {error ? (
+        {STATIC_DEPLOYMENT ? (
+          <p>{STATIC_NOTICE} 此处不展示服务器额度，也不提供密钥输入。</p>
+        ) : error ? (
           <p role="alert">{error}</p>
         ) : !data ? (
           <p role="status">正在读取平台状态…</p>

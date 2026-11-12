@@ -1,7 +1,9 @@
+import { STATIC_DEPLOYMENT, STATIC_NOTICE } from "./deployment";
 import React, { Component, type ReactNode, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   BrowserRouter,
+  HashRouter,
   Link,
   NavLink,
   Route,
@@ -32,7 +34,13 @@ class Boundary extends Component<{ children: ReactNode }, { failed: boolean }> {
       <main>
         <h1>页面暂时无法显示</h1>
         <p>学习记录保存在此设备。请重新加载后重试。</p>
-        <a href="/home">返回首页</a>
+        <a
+          href={
+            STATIC_DEPLOYMENT ? `${import.meta.env.BASE_URL}#/home` : "/home"
+          }
+        >
+          返回首页
+        </a>
       </main>
     ) : (
       this.props.children
@@ -249,6 +257,7 @@ function Missing() {
     </>
   );
 }
+const Router = STATIC_DEPLOYMENT ? HashRouter : BrowserRouter;
 function App() {
   const [online, setOnline] = useState(navigator.onLine);
   React.useEffect(() => {
@@ -261,8 +270,19 @@ function App() {
     };
   }, []);
   return (
-    <BrowserRouter>
-      <a className="skip" href="#main">
+    <Router>
+      <a
+        className="skip"
+        href="#main"
+        onClick={
+          STATIC_DEPLOYMENT
+            ? (event) => {
+                event.preventDefault();
+                document.getElementById("main")?.focus();
+              }
+            : undefined
+        }
+      >
         跳到主要内容
       </a>
       <aside>
@@ -302,7 +322,8 @@ function App() {
             当前离线。已加载的课程仍可阅读；在线服务暂不可用。
           </p>
         )}
-        <main id="main">
+        {STATIC_DEPLOYMENT && <p className="notice">{STATIC_NOTICE}</p>}
+        <main id="main" tabIndex={-1}>
           <Boundary>
             <Routes>
               <Route path="/" element={<Landing />} />
@@ -334,7 +355,7 @@ function App() {
           </footer>
         </main>
       </div>
-    </BrowserRouter>
+    </Router>
   );
 }
 createRoot(document.getElementById("root")!).render(
