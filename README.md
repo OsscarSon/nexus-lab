@@ -1,18 +1,32 @@
-# NEXUS LAB — Product Blueprint V4
+# NEXUS LAB
 
-Planning pack for Codex. This is a **specification pack, not an implemented application**.
+Chinese-first interactive technology academy. Built incrementally on the product specifications in `docs/`.
 
-## Vision
-An approachable interactive technology academy with ten academies, a unified workspace, labs, AI Mentor, and Google Workspace productivity learning. Simple by default, advanced features on demand. Chinese-first with English terms.
+## Development
 
-## Files
-- `docs/PRODUCT_SPEC.md`: mission, navigation, UX, platform rules and acceptance criteria.
-- `docs/OPEN_SOURCE_ACADEMY.md`: complete 12-module curriculum with exercises and final projects.
-- `docs/AI_MENTOR.md`: keyless-onboarding provider architecture, limits and security.
-- `docs/ARCHITECTURE.md`: technical architecture, packages, schemas, routes, security and test plan.
-- `docs/UI_SPEC.md`: site-wide page inventory, mobile layout, states and visual system.
-- `AGENTS.md`: durable Codex repository instructions.
-- `tasks/PHASES.md`: incremental task breakdown and acceptance checks.
-- `tasks/CODEX_START_PROMPT.md`: first executable assignment for Codex.
+Node 24 and pnpm 11.25.0 are validated. In managed cloud shells:
 
-Do not claim implemented features before implementation. Each phase must produce working software with tests and a demo path.
+```sh
+export XDG_DATA_HOME=/workspace/.local/share
+export XDG_CACHE_HOME=/workspace/.cache
+export NPM_CONFIG_CACHE=/workspace/.cache/npm
+cd /workspace/nexus-lab
+pnpm install --frozen-lockfile
+pnpm dev
+```
+
+```sh
+pnpm typecheck
+pnpm lint
+pnpm test
+pnpm build
+CHROMIUM_PATH=/usr/bin/chromium pnpm test:e2e
+```
+
+On other machines, omit `CHROMIUM_PATH` after installing Playwright Chromium with `pnpm exec playwright install chromium`.
+
+Routes: `/` landing, `/welcome` goal selection, `/home`, `/learn`, `/learn/:academy`, `/lab`, `/projects`, `/me`. Unsupported routes show a recovery page. Academy curricula are explicitly marked as planned until implemented. Data is stored locally; no account or secret is needed.
+
+Dependencies: React for rendering, React Router for navigation, Zod for content validation. Vite/TypeScript provide strict compilation, ESLint static checks, Vitest domain tests, and Playwright desktop/mobile functional checks. CSS tokens implement the shared visual system without a styling framework.
+
+See `docs/CURRENT_STATUS.md` for verified scope and limitations. Product specifications remain the source of truth; unimplemented later phases are not presented as working features.
