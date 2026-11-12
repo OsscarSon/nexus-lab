@@ -1,6 +1,6 @@
 # NEXUS LAB
 
-Chinese-first interactive technology academy. Built incrementally on the product specifications in `docs/`.
+Chinese-first interactive technology academy. All ten academies are equally important and share one learning platform; Open Source M01 is the first implementation example, not a central academy. The proposed shared curriculum graph and neutral-engine migration are documented, not yet implemented. See [product principles](docs/PRODUCT_SPEC.md), [architecture](docs/ARCHITECTURE.md), [roadmap](docs/ROADMAP.md) and [current implementation status](docs/CURRENT_STATUS.md).
 
 ## Development
 
