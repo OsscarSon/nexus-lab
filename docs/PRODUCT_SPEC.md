@@ -1,23 +1,79 @@
-# Product Specification — NEXUS LAB v4
+# 产品规范 — NEXUS LAB v5
 
-## Product promise
-A free-to-start, beginner-friendly path from understanding technology to creating real, independently verifiable projects. Ten academies: Programming; AI; Game Development; Computer Engineering; Web & Cloud; Networking & Cybersecurity; Robotics & IoT; Future Technology; Workspace & Automation; Open Source.
+## 产品承诺
 
-## Non-negotiables
-No required API key for learners. One prominent next action per screen. Guided learning over dump of links. Real, labeled simulations; do not claim mock tools are real execution. Core interface Chinese-first, English technology labels. Responsive mobile-first behavior and accessible patterns. AI is opt-in contextually and does not secretly execute tools. Lessons have objectives, demos, practice, feedback and measurable success.
+面向初学者，从理解技术到制作可独立验证的作品。平台由十个地位平等的学院组成，不设主学院、次学院或必须经过的中心学院。
 
-## User journeys
-1. Beginner AI learner: choose `I want to learn AI` → Prompt Basics → guided rewrite → check against rubric → save.
-2. Open source explorer: choose Open Source → understand README → Git simulator → compare licenses → produce fork practice artifacts.
-3. Workspace user: choose Events mission → complete simulated Form/Sheet workflow → optionally connect Google with explicit scopes.
-4. Aspiring game maker: Blockly starter → JavaScript fundamentals → Phaser level → exported playable game.
-5. Returning student: `/home` continue card → next lesson → see progress and project artifact.
+| 学院 ID（保持现有值） | 学院 | 英文名称 |
+| --- | --- | --- |
+| `programming` | 编程学院 | Programming |
+| `ai` | 人工智能 | Artificial Intelligence |
+| `games` | 游戏开发 | Game Development |
+| `engineering` | 计算机工程 | Computer Engineering |
+| `web` | 网站与云端 | Web & Cloud |
+| `security` | 网络与安全 | Networking & Cybersecurity |
+| `robotics` | 机器人与物联网 | Robotics & IoT |
+| `future` | 未来科技 | Future Technology |
+| `workspace` | 效率与自动化 | Workspace & Automation |
+| `opensource` | 开源学院 | Open Source |
 
-## Site map
-Public landing; onboarding; Home; Learn; Academy; Course; Lesson; Paths; Labs; Lab Workspace; Open Source Explorer; Workspace Studios; Projects; Project Workspace; Toolbox; Passport; Profile; AI settings; Admin.
+表格次序仅用于目录稳定展示，不代表重要性或开发优先级。开源 M01 是学习引擎的首个实现案例，不是平台中心、共享课程的所有者或其他学院的必修入口。实现较早、内容较多不赋予更高地位；地位平等也不代表十个学院当前已有相同数量的可用课程。
 
-## Monetization and privacy stance
-No promises of unlimited free model usage. Fair usage, transparent limits, server-side cost guardrails, local and self-key options as future enhancements. No ads in learning surface by default. Learner projects private by default; public publishing requires explicit consent. Platform should avoid unnecessary collection of minors' personal data and comply with deployment-region laws.
+## 同等可见与同等能力
 
-## Roadmap sequencing
-MVP = polished navigation, complete mini-course with 5 real lessons in Open Source Foundations, 1 Git simulation, 1 complete Python mini-course with runnable samples, 1 Workspace formula lab, local progress, basic fallback mentor. Next = account sync and cloud AI gateway, GitHub explorer, project library. Later = ten full academy curricula and advanced labs.
+保留 Home、Learn、Lab、Projects、Me 五个主导航。Learn 是十个学院共同的入口：桌面与移动端使用同样的卡片规格、信息层级、访问深度和目录/搜索规则，不为某个学院提供永久置顶或独占主导航。
+
+首次引导提供全部十个方向及“自由探索/跳过”，不预选某个学院作为全平台默认。首页不需要同时堆放十个学院；它显示学习者选择的方向、真实最近学习记录和“查看全部学院”入口。推荐必须解释依据，允许修改目标；没有个人信号时展示平衡的探索入口，不固定导向开源。规划中的学院仍然可进入查看目标与路线图，不能因为内容尚少而被隐藏。
+
+所有学院平等使用同一个课程目录、课程渲染器、互动实验适配器、测评、进度、作品证据与 Mentor 接口。学院差异通过内容、目标、路径编排和实验能力表达，不通过复制十套学习引擎表达。不要求其他学院先完成开源课程才可使用平台功能。
+
+## 统一学习结构
+
+每个学院采用同样的结构：学院目标 → 学习路径 → 课程 → 模块 → 课时 → 练习/测评 → 学习证据/作品。路径可跨学院引用内容，并非严格的所有权树。
+
+- 课程：稳定 ID、目标、难度、预计时间、课程发布状态、模块引用、先修知识、结业标准与作品要求。
+- 课时：目标、概念说明、演示、独立练习、可访问反馈、提示、检查题、参考来源及内容版本。
+- 实验：共享实验 ID、明确的模拟/真实执行标签、能力与设备要求、运行/检查/重置、量规和替代学习方式。
+- 测评：题库/量规、通过条件、尝试结果、证据及反馈；不能以点击“完成”代替需要验证的能力。
+- 进度：按稳定内容 ID 记录课时与测评证据，按路径聚合；重复引用同一内容不要求重复学习或重复计数。
+- 作品：每个学院都可关联项目模板、里程碑、量规与证据。默认私有，支持的保存/导出方式与设备限制必须真实标明；不暗示尚未实现云同步。
+
+这些是统一产品契约，不是十套完整课程已经发布的声明。现有功能与缺口见 [CURRENT_STATUS.md](CURRENT_STATUS.md)。
+
+## 共享知识与课程依赖
+
+Git、GitHub、Python、API 和云部署等是平台共享主题，不属于某个学院的专属基础设施。内容只维护一个权威定义，通过稳定 ID 被多个学习路径引用。不同学院可补充有独立目标的情境练习，但不能复制相同底层课时、测评或进度。
+
+区分必需先修、推荐先修与相关主题。只有真正影响本课成功条件的先修知识才可成为门槛；相关主题不锁课。依赖关系必须可解释、可验证、无环；规划中的先修内容不能被伪装成可完成的入口。可选、自成一体的学习路径不必依赖尚未开放的课程。
+
+实现模型、迁移与兼容规则见 [ARCHITECTURE.md](ARCHITECTURE.md)。共享图与通用渲染器尚未实现时，不得声称跨路径复用或进度自动抵扣已经工作。
+
+## 发布状态与学习状态分开
+
+| 维度 | 状态 | 展示规则 |
+| --- | --- | --- |
+| 内容发布 | `planned` 规划中 | 目标/路线图可查看，不提供伪造的开始课程按钮 |
+| 内容发布 | `in-development` 开发中 | 不宣称稳定可用或课程已经完成 |
+| 内容发布 | `available` 可学习 | 已实现并通过该内容所需的运行与测评检查；验证范围可查 |
+| 内容发布 | `archived` 已归档 | 保留历史证据与兼容入口，说明替代版本 |
+| 学习者进度 | `not-started` / `in-progress` / `completed` | 仅由该学习者的真实记录和课程结业规则得出 |
+
+“课程开发已完成”与“学习者已完成课程”不是同一件事。学院不得仅用一个布尔值代表所有课程状态；某个实验可用不意味着整个学院课程完整。专家内容审核与技术功能验证也要分别披露。
+
+## 用户旅程（各方向同等成立）
+
+学习者可直接选择任一学院，查看该学院的实际可用课程和规划，使用共同课时/实验界面完成练习、获得反馈并保存证据。例如游戏路径可引用共享 Git 内容，机器人路径可引用 Python，Workspace 路径可引用 API；不需要绕道开源学院。上述路径是产品目标，不能作为未实现课程的演示承诺。
+
+回访用户：首页继续其最近或主动选择的路径，而非固定学院。跨路径遇到已经完成且版本兼容的共享课时，显示已有证据并允许回顾；新量规要求补做时说明原因，不清空历史记录。
+
+## 不可妥协的原则
+
+中国简体中文优先，保留英文技术名；移动端、键盘及屏幕阅读器可用；每个主要界面有清楚的下一步。基础学习无需账户或自带 API key。平台密钥仅在服务端；AI 是可选帮助，未启用时明确提供非生成式内容。不得虚构学习记录、AI 回复、代码执行、课程完备性或外部服务状态。外部仓库代码不得在 API 服务直接运行。
+
+## 隐私与费用
+
+学习者作品默认私有；公开发布与外部账户写入需明确同意。不承诺无限免费推理。保留预算、限额和诚实回退，减少个人数据收集，不在浏览器存储平台密钥。账号、数据保留、运行时与部署的现状见 [ENVIRONMENT.md](ENVIRONMENT.md)。
+
+## 路线图与验收
+
+[ROADMAP.md](ROADMAP.md) 是后续工作排序与验收依据；[../tasks/PHASES.md](../tasks/PHASES.md) 保留早期阶段执行记录。后续优先级根据学习者需求、课程依赖、可访问性、资源与可验证交付决定，不因开源学院最先实现而持续优先。
