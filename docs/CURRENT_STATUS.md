@@ -158,3 +158,9 @@ Pages 代码和工作流准备就绪不代表线上部署成功。首次部署�
 没有更改旧内容 ID、路由、localStorage 键或 SQLite 格式，没有迁移/清空用户数据。新增 `nexus-ui-history` 仅保存至多 12 条实际访问；访问不算完成。账户课程同步与非生成式帮助/平台 AI 的原有限制不变；Pages 仍明确不提供后台账户/同步/生成式 AI。当前改动未推送，不能宣称线上 UI 已更新。
 
 完整跨学院课程依赖图、通用后端课时注册/新进度格式、十学院完整课程、云作品编辑器、深色模式和真实设备验收仍是后续工作。实时 AI 仍因没有有效服务端 provider 配置而未验证。下一步应继续共享课程图与证据兼容工作，不因首个课程实现较早而优先某学院。
+
+## Phase 5A — 十学院中立发现
+
+按 GitHub Issue #1 与最新 ROADMAP 实施新的 Phase 5，历史 Open Source Explorer 定义不适用。从最新 origin/main 创建 feature/phase5-curriculum，并合入已验证 UI V2 两个提交，未改 main。十学院同级入口/全量引导/中立首页保留；呈现模型补齐 available / in-development / planned 三种发布状态，发布可用性与学习者完成记录分开，未发布项目不生成假开始操作。5B/5C/5D 尚待后续提交。GitHub API 暂因 Forbidden 阻塞 PR 创建；Git 与 Issue 网页可读，已保存仅增加 api.github.com 的网络草案，尚未应用。
+
+5A 验证：lint、typecheck、49 项 unit/API 测试、生产构建、14 项桌面/移动中立入口与 UI V2 回归通过。新增发布状态时发现旧测试仅区分两态的类型假设，已改为明确以 available 判断可执行路由并重新通过 typecheck/build。

@@ -37,7 +37,7 @@ describe("equal academy presentation", () => {
   it("never gives planned courses executable routes and references real shared labs", () => {
     for (const a of academies)
       for (const c of academyCourses(a.id)) {
-        if (c.status === "planned") expect("route" in c).toBe(false);
+        if (c.status !== "available") expect("route" in c).toBe(false);
         else
           expect(c.route).toMatch(
             /^\/(lab\/(git|logic|python|spreadsheet)|learn\/opensource\/foundations)$/,
@@ -120,4 +120,29 @@ describe("existing learning evidence", () => {
     expect(readArtifacts()).toEqual([]);
     expect(memory.has("nexus-worksheet")).toBe(true);
   });
+});
+
+import { courseSchema, publicationLabels } from "../content/experience";
+it("distinguishes published, developing and planned courses independently of learner completion", () => {
+  const base = {
+    id: "neutral-course",
+    title: "课程",
+    description: "课程说明",
+    level: "beginner",
+    kind: "course",
+  };
+  expect(courseSchema.safeParse({ ...base, status: "available" }).success).toBe(
+    false,
+  );
+  expect(courseSchema.parse({ ...base, status: "in-development" }).status).toBe(
+    "in-development",
+  );
+  expect(courseSchema.parse({ ...base, status: "planned" }).status).toBe(
+    "planned",
+  );
+  expect(Object.values(publicationLabels)).toEqual([
+    "已发布",
+    "开发中",
+    "规划中",
+  ]);
 });

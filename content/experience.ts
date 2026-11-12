@@ -184,6 +184,7 @@ const base = {
 export const courseSchema = z.discriminatedUnion("status", [
   z.object({ ...base, status: z.literal("available"), route: z.string() }),
   z.object({ ...base, status: z.literal("planned") }),
+  z.object({ ...base, status: z.literal("in-development") }),
 ]);
 export type CourseEntry = z.infer<typeof courseSchema>;
 export function academyCourses(id: string): CourseEntry[] {
@@ -258,7 +259,9 @@ export function academyAvailability(id: string) {
     ? "课程可学习"
     : entries.some((c) => c.status === "available")
       ? "实践可用 · 课程规划中"
-      : "课程规划中";
+      : entries.some((c) => c.status === "in-development")
+        ? "课程开发中"
+        : "课程规划中";
 }
 export const levelLabels = {
   beginner: "初阶",
@@ -268,3 +271,9 @@ export const levelLabels = {
 export function findAcademy(id: string) {
   return academies.find((a) => a.id === id);
 }
+
+export const publicationLabels = {
+  available: "已发布",
+  "in-development": "开发中",
+  planned: "规划中",
+} as const;

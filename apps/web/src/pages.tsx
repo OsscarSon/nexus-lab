@@ -7,6 +7,7 @@ import {
   academyAvailability,
   labCatalog,
   levelLabels,
+  publicationLabels,
   type CourseEntry,
 } from "../../../content/experience";
 import { lessons } from "../../../content/opensource";
@@ -464,9 +465,9 @@ function CourseCard({
   return (
     <article className="card course-card">
       <div className="card-top">
-        <Badge muted={c.status === "planned"}>
-          {c.status === "planned"
-            ? "规划中"
+        <Badge muted={c.status !== "available"}>
+          {c.status !== "available"
+            ? publicationLabels[c.status]
             : c.kind === "course"
               ? "可学习"
               : "实践可用"}
@@ -616,8 +617,10 @@ export function CourseDetails() {
         {course.description}
       </PageIntro>
       <div className="card">
-        <Badge muted={course.status === "planned"}>
-          {course.status === "planned" ? "规划中 · 尚未开放" : "已开放"}
+        <Badge muted={course.status !== "available"}>
+          {course.status === "available"
+            ? "已发布 · 可学习"
+            : publicationLabels[course.status] + " · 尚未开放"}
         </Badge>
         <h2>学习目标与准备</h2>
         <ul className="objectives">
