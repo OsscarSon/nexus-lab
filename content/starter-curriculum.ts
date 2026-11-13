@@ -19,6 +19,10 @@ type Seed = {
   hint: string;
   topics: string[];
   next: string;
+  prerequisites?: string[];
+  challenge?: string;
+  nextStep?: string;
+  references?: { title: string; url: string }[];
 };
 const seeds: Seed[] = [
   {
@@ -377,6 +381,166 @@ const seeds: Seed[] = [
     next: "shared-git-basics",
   },
 ];
+seeds.push(
+  {
+    id: "games-motion",
+    title: "一步一步移动：位置、速度与碰撞",
+    summary: "理解位置与速度；用按钮控制角色并解释边界碰撞",
+    objective: "理解位置与速度；用按钮控制角色并解释边界碰撞",
+    heading: "从生活例子理解原理",
+    body: "2D 游戏中的位置 position 可以用 x、y 表示。这里每按一次向右，x 增加速度 speed；这是离散步进模型，不是每秒自动更新的物理引擎。角色碰到墙壁时停止在边界，拿到金币会增加得分。规则、输入和可见反馈一起构成可玩的机制。",
+    example:
+      "棋子在棋盘格上移动，每次走几格就是步长。步长太大可能越过目标，所以本实验使用经过路径上的碰撞检测，不要求恰好落在金币格。",
+    block: { kind: "motion", id: "exercise.games-motion" },
+    question: "角色在 x=9，速度 3，墙在 x=10，采用边界限制后位置是？",
+    options: ["12", "9", "10"],
+    correct: 2,
+    explanation:
+      "边界限制把新位置限制在 10。真实游戏还需要考虑角色尺寸和连续碰撞，本模型把角色视为点。",
+    hint: "先算 9+3，再应用最大位置 10。",
+    topics: ["topic.state"],
+    next: "games-score",
+    prerequisites: ["无需编程基础；能阅读文字和使用按钮或键盘。"],
+    challenge:
+      "先用速度 1 向右移动观察位置，再重置。独立挑战：选择速度 2 或 3，收集 x=6 的金币，再走到 x=10 的墙；解释为什么不能越过墙。",
+    nextStep:
+      "下一步可研究跳跃、重力和逐帧时间；本课不把步进模型称为完整游戏引擎。",
+    references: [
+      {
+        title: "MDN 2D collision detection",
+        url: "https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection",
+      },
+    ],
+  },
+  {
+    id: "engineering-binary",
+    title: "四个开关怎样表示一个数",
+    summary: "读懂四位无符号二进制；把 0–15 的数转换为开关组合",
+    objective: "读懂四位无符号二进制；把 0–15 的数转换为开关组合",
+    heading: "从生活例子理解原理",
+    body: "二进制 binary 每一位 bit 只能是 0 或 1。从右向左的位权是 1、2、4、8。某位为 1 就把对应位权加起来。四位无符号数的范围是 0–15；本课不讨论负数编码。逻辑门是对这些 0/1 信号做运算的规则。",
+    example:
+      "四盏灯分别代表 8、4、2、1 元，亮起 8 和 2 就代表 10 元。它不是把字符“1”“0”拼成十进制数字。",
+    block: { kind: "binary", id: "exercise.engineering-binary" },
+    question: "二进制 0101 表示十进制多少？",
+    options: ["5", "101", "10"],
+    correct: 0,
+    explanation: "4+1=5。前导 0 不增加数值。",
+    hint: "只把为 1 的位权加起来。",
+    topics: ["topic.logic"],
+    next: "engineering-and",
+    prerequisites: ["无需编程基础；能阅读文字和使用按钮或键盘。"],
+    challenge:
+      "切换每个 bit，观察加法展开。独立挑战：表示十进制 10，再表示 5，比较每一位的变化；在逻辑门实验中试 AND 与 OR 的不同输出。",
+    nextStep: "下一步进入逻辑门实验，用真值表解释 AND、OR 与 XOR。",
+    references: [
+      {
+        title: "BBC Bitesize binary",
+        url: "https://www.bbc.co.uk/bitesize/guides/zwsbwmn/revision/1",
+      },
+    ],
+  },
+  {
+    id: "web-structure",
+    title: "把内容变成网页：HTML 结构与预览",
+    summary: "区分标题、段落与按钮；修改结构并观察浏览器渲染",
+    objective: "区分标题、段落与按钮；修改结构并观察浏览器渲染",
+    heading: "从生活例子理解原理",
+    body: "HTML 是标记语言，用元素描述内容结构。h1 表示页面主标题，p 表示段落，button 表示按钮。开始标签与结束标签包住内容。CSS 控制外观，JavaScript 提供程序行为；HTML 按钮本身不会自动保存数据。这里从受限标签提取文本并用固定组件显示，不执行输入脚本。",
+    example:
+      "把一张活动海报整理成标题、说明和报名按钮，比把所有文字塞进一个段落更容易阅读。正确的标签也帮助辅助技术理解结构。",
+    block: { kind: "markup", id: "exercise.web-structure" },
+    question: "只写一个 button 标签会自动把数据保存到服务器吗？",
+    options: ["会", "不会，还需要行为与服务端支持", "文字写“保存”就会"],
+    correct: 1,
+    explanation:
+      "按钮文字是界面承诺，不代表功能已经实现。本预览的按钮仅用于学习语义，不会提交资料。",
+    hint: "想一想：服务器地址和处理代码在哪里？",
+    topics: ["topic.apis"],
+    next: "web-request",
+    prerequisites: ["无需编程基础；能阅读文字和使用按钮或键盘。"],
+    challenge:
+      '修改 HTML 并查看即时预览。独立挑战：写一个非空 h1、一个 p，以及 type="button" 的 button。不要加入脚本、外部资源或表单。',
+    nextStep: "下一步可学习 CSS 与请求/响应；网页预览不是云部署。",
+    references: [
+      {
+        title: "MDN HTML basics",
+        url: "https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website/Creating_the_content",
+      },
+    ],
+  },
+  {
+    id: "future-sampling",
+    title: "把连续信号变成数据：采样与信息损失",
+    summary: "理解采样率；解释欠采样和混叠的风险",
+    objective: "理解采样率；解释欠采样和混叠的风险",
+    heading: "从生活例子理解原理",
+    body: "采样 sampling 是间隔一段时间记录信号。这里显示频率为 2 Hz 的理想正弦波，横轴一秒。每秒采样次数是采样率 sample rate。对带限信号，要有超过最高频率两倍的采样率并满足重建条件，才可能避免混叠 aliasing；“多几个点”本身不保证真实设备没有噪声。",
+    example:
+      "拍摄快速转动的车轮，有时看起来倒转，是时间采样造成的错觉。机器人、医疗传感器与数字音频都要考虑采样，而不是只看图像是否平滑。",
+    block: { kind: "sampling", id: "exercise.future-sampling" },
+    question: "本模型 2 Hz 信号，下列哪一个采样率严格高于两倍频率？",
+    options: ["3 Hz", "4 Hz", "8 Hz"],
+    correct: 2,
+    explanation:
+      "8 > 2*2；4 正好位于边界，采样相位可能丢掉波形，不作为本挑战的可靠选择。",
+    hint: "两倍是 4；题目要求严格高于。",
+    topics: ["topic.models"],
+    next: "future-models",
+    prerequisites: ["无需编程基础；能阅读文字和使用按钮或键盘。"],
+    challenge:
+      "调节采样率比较点的位置与原始曲线。独立挑战：分别试 3、4、8 次/秒，为 2 Hz 信号选择安全高于两倍频率的选项并解释。",
+    nextStep: "下一步比较噪声、分辨率与采样率；这些是不同的误差来源。",
+    references: [
+      {
+        title: "Analog Devices Sampling Theory",
+        url: "https://www.analog.com/media/en/training-seminars/design-handbooks/Technical-Books-PDF/Section5.pdf",
+      },
+    ],
+  },
+);
+
+const sources: Record<string, { title: string; url: string }> = {
+  "shared-git-basics": {
+    title: "Git book: recording changes",
+    url: "https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository",
+  },
+  "shared-evidence-basics": {
+    title: "NIST: scientific foundations",
+    url: "https://www.nist.gov/",
+  },
+  "ai-prompt-structure": {
+    title: "OpenAI Prompt engineering",
+    url: "https://platform.openai.com/docs/guides/prompt-engineering",
+  },
+  "games-score": {
+    title: "MDN Anatomy of a video game",
+    url: "https://developer.mozilla.org/en-US/docs/Games/Anatomy",
+  },
+  "engineering-and": {
+    title: "Nand2Tetris Boolean logic",
+    url: "https://www.nand2tetris.org/project01",
+  },
+  "security-permissions": {
+    title: "OWASP Authorization Cheat Sheet",
+    url: "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Cheat_Sheet.html",
+  },
+  "robotics-threshold": {
+    title: "Arduino Analog Read Serial",
+    url: "https://docs.arduino.cc/built-in-examples/basics/AnalogReadSerial/",
+  },
+  "future-models": {
+    title: "NIST AI Risk Management Framework: measurement",
+    url: "https://www.nist.gov/itl/ai-risk-management-framework",
+  },
+  "workspace-budget": {
+    title: "Microsoft SUM function",
+    url: "https://support.microsoft.com/en-us/office/sum-function-043e1c7d-7726-4e80-8f32-07b23e057f89",
+  },
+};
+for (const seed of seeds)
+  if (sources[seed.id]) seed.references = [sources[seed.id]];
+
 const starters = [
   [
     "programming",
@@ -388,12 +552,28 @@ const starters = [
     "提示结构与结果验证",
     ["shared-evidence-basics", "ai-prompt-structure"],
   ],
-  ["games", "游戏规则与计分", ["games-score", "shared-git-basics"]],
-  ["engineering", "AND 与真值表", ["engineering-and"]],
-  ["web", "HTTP 请求入门", ["web-request", "shared-api-basics"]],
+  [
+    "games",
+    "2D 游戏：移动、碰撞与规则",
+    ["games-motion", "games-score", "shared-git-basics"],
+  ],
+  [
+    "engineering",
+    "二进制与 AND 逻辑",
+    ["engineering-binary", "engineering-and"],
+  ],
+  [
+    "web",
+    "网页结构与 HTTP 请求",
+    ["web-structure", "web-request", "shared-api-basics"],
+  ],
   ["security", "最小权限入门", ["security-permissions"]],
   ["robotics", "传感、阈值与控制", ["robotics-threshold", "shared-api-basics"]],
-  ["future", "预测、模型与实测", ["shared-evidence-basics", "future-models"]],
+  [
+    "future",
+    "采样、模型与实测",
+    ["future-sampling", "shared-evidence-basics", "future-models"],
+  ],
   [
     "workspace",
     "预算公式与数据接口",
@@ -405,13 +585,28 @@ const starters = [
     ["opensource-permission", "shared-git-basics"],
   ],
 ] as const;
+const legacySlices: Record<string, { title: string; ids: string[] }> = {
+  games: { title: "游戏规则与计分", ids: ["games-score", "shared-git-basics"] },
+  engineering: { title: "AND 与真值表", ids: ["engineering-and"] },
+  web: { title: "HTTP 请求入门", ids: ["web-request", "shared-api-basics"] },
+  future: {
+    title: "预测、模型与实测",
+    ids: ["shared-evidence-basics", "future-models"],
+  },
+};
 export const starterInventory = starters.map(
   ([academyId, title, lessonIds]) => ({
     academyId,
     title,
-    courseId: "course." + academyId + "-starter",
-    moduleId: "module." + academyId + "-starter",
-    pathId: "path." + academyId,
+    courseId:
+      "course." +
+      academyId +
+      (legacySlices[academyId] ? "-quality" : "-starter"),
+    moduleId:
+      "module." +
+      academyId +
+      (legacySlices[academyId] ? "-quality" : "-starter"),
+    pathId: "path." + academyId + (legacySlices[academyId] ? "-quality" : ""),
     lessonIds: [...lessonIds],
   }),
 );
@@ -448,7 +643,22 @@ export function addStarterCurriculum(base: Catalog): Catalog {
     add("lesson", seed.id, seed.title, {
       objectives: [seed.objective],
       summary: seed.summary,
-      segments: [{ heading: seed.heading, body: seed.body }],
+      prerequisites: seed.prerequisites || [
+        "无需专业基础；可先阅读示例，遇到必需先修时按页面说明学习。",
+      ],
+      challenge:
+        seed.challenge ||
+        seed.objective + "先预测，再独立完成下方互动，并用检查题解释原因。",
+      nextStep:
+        seed.nextStep ||
+        "完成本课后，可继续课程目录的下一课；共享主题的记录会在兼容路径复用。",
+      segments: [
+        { heading: seed.heading, body: seed.body },
+        {
+          heading: "先观察，再解释",
+          body: "写下你预期的结果，改变一个输入再观察。如果与预测不同，请比较条件、输入和输出；正确解释比反复点击检查更重要。完成后把本课想法用于自己的一个生活例子。",
+        },
+      ],
       example: seed.example,
       estimatedMinutes: seed.block.kind === "lab-evidence" ? 10 : 5,
       topicRefs: seed.topics.map((id) => ref("topic", id)),
@@ -457,34 +667,100 @@ export function addStarterCurriculum(base: Catalog): Catalog {
       requiresExercise: true,
       legacyCompatible: false,
       hints: [seed.hint],
-      references: seed.topics.includes("topic.licenses")
-        ? [
-            {
-              title: "Open Source Definition",
-              url: "https://opensource.org/osd",
-            },
-          ]
-        : seed.topics.includes("topic.python")
+      references:
+        seed.references ||
+        (seed.topics.includes("topic.licenses")
           ? [
               {
-                title: "Python Tutorial",
-                url: "https://docs.python.org/3/tutorial/",
+                title: "Open Source Definition",
+                url: "https://opensource.org/osd",
               },
             ]
-          : seed.topics.includes("topic.apis")
+          : seed.topics.includes("topic.python")
             ? [
                 {
-                  title: "MDN HTTP overview",
-                  url: "https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview",
+                  title: "Python Tutorial",
+                  url: "https://docs.python.org/3/tutorial/",
                 },
               ]
-            : [],
+            : seed.topics.includes("topic.apis")
+              ? [
+                  {
+                    title: "MDN HTTP overview",
+                    url: "https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview",
+                  },
+                ]
+              : [
+                  {
+                    title: "MDN Web technology",
+                    url: "https://developer.mozilla.org/en-US/docs/Web",
+                  },
+                ]),
       nextRefs: [ref("lesson", seed.next)],
     });
   }
   for (const item of starterInventory) {
     const lessons = item.lessonIds.map((id) => ref("lesson", id));
-    const projectId = "project." + item.academyId + "-starter";
+    const previous = legacySlices[item.academyId];
+    const projectId =
+      "project." + item.academyId + (previous ? "-quality" : "-starter");
+    if (previous) {
+      // Preserve original v1 course/module/project/path requirements exactly. New challenges get new identities.
+      const original = catalog.entities.find(
+        (e) =>
+          e.kind === "course" &&
+          e.id === "course." + item.academyId + "-starter",
+      )!;
+      const oldPath = catalog.entities.find(
+        (e) => e.kind === "path" && e.id === "path." + item.academyId,
+      )!;
+      if (original.kind !== "course" || oldPath.kind !== "path")
+        throw Error("Missing legacy course");
+      const oldRefs = previous.ids.map((id) => ref("lesson", id));
+      const oldProject = "project." + item.academyId + "-starter";
+      const oldModule = "module." + item.academyId + "-starter";
+      original.status = "available";
+      original.title = previous.title;
+      original.description =
+        "零基础入门 · " + oldRefs.length + " 节真实课时、互动练习与检查题";
+      original.outcomes = previous.ids.map(
+        (id) => seeds.find((s) => s.id === id)!.objective,
+      );
+      original.moduleRefs = [ref("module", oldModule)];
+      original.projectRefs = [ref("project", oldProject)];
+      add("module", oldModule, previous.title, {
+        outcomes: original.outcomes,
+        lessonRefs: oldRefs,
+        assessmentRefs: [],
+      });
+      add("project", oldProject, previous.title + " · 入门学习证据", {
+        description:
+          "汇总本模块实际通过的练习和测验，不是外部认证或完整学院结业。",
+        rubric: [
+          "完成本模块所有必需课时",
+          "每课互动检查与测验均通过",
+          "共享课时只保存一份兼容证据",
+        ],
+        completionRefs: oldRefs,
+      });
+      oldPath.status = "available";
+      oldPath.projectRefs = [ref("project", oldProject)];
+      catalog.entities.push({
+        ...structuredClone(original),
+        id: item.courseId,
+      });
+      add("path", item.pathId, item.title + " · 质量升级路径", {
+        academyRefs: [ref("academy", item.academyId)],
+        outcomes: original.outcomes,
+        courseRefs: [ref("course", item.courseId)],
+        projectRefs: [],
+      });
+      const academy = catalog.entities.find(
+        (e) => e.kind === "academy" && e.id === item.academyId,
+      )!;
+      if (academy.kind === "academy")
+        academy.pathRefs.unshift(ref("path", item.pathId));
+    }
     add("module", item.moduleId, item.title, {
       outcomes: item.lessonIds.map(
         (id) => seeds.find((s) => s.id === id)!.objective,

@@ -1,3 +1,4 @@
+import { qualityLabel } from "../../../packages/curriculum/quality";
 import { useEffect, useState } from "react";
 import { Link, NavLink, useParams, useSearchParams } from "react-router-dom";
 import {
@@ -72,7 +73,19 @@ export function Course() {
         {course.description}
       </PageIntro>
       <div className="course-outcomes card">
-        <Badge>课程可学习</Badge>
+        <Badge>{qualityLabel(course.quality)}</Badge>
+        {course.quality && (
+          <details>
+            <summary>课程质量与发布说明</summary>
+            <p>
+              内部评分（准确性 / 教学 / 互动 / 体验 / 测评反馈 / 可靠性）：
+              {course.quality.scores.join(" / ")}，总分{" "}
+              {course.quality.scores.reduce((a, b) => a + b, 0)}
+              /30。正式发布需总分至少 25 且各项至少 4。
+            </p>
+            <p>{course.quality.scope}</p>
+          </details>
+        )}
         <h2>这一次，你会学到</h2>
         <ul className="objectives">
           {course.outcomes.map((o) => (
@@ -312,6 +325,12 @@ function LessonBody({
           <Icon name="compass" size={20} />
           <p>学习目标：{l.objectives.join("；")}</p>
         </div>
+        <p>
+          先修知识：
+          {l.prerequisites?.join("；") ||
+            "无需专业基础；按下方必需先修提示继续。"}
+        </p>
+        {course && <p className="fine">{qualityLabel(course.quality)}</p>}
         {storageWarning && <p role="alert">{storageWarning}</p>}
         {prerequisites.length > 0 && (
           <details>
@@ -380,6 +399,12 @@ function LessonBody({
               children: (
                 <>
                   <span className="eyebrow">TRY & CHECK</span>
+                  {l.challenge && (
+                    <section className="example-card">
+                      <h2>独立挑战</h2>
+                      <p>{l.challenge}</p>
+                    </section>
+                  )}
                   {l.blocks
                     .filter((b) => b.kind !== "repository")
                     .map((b) => (
@@ -453,6 +478,7 @@ function LessonBody({
                       完成检查后，这里会显示具体反馈。回答错误也可以继续尝试。
                     </p>
                   )}
+                  {l.nextStep && <p>{l.nextStep}</p>}
                   {passed &&
                     (next ? (
                       <Link

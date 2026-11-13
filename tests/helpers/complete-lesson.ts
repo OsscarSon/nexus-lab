@@ -39,6 +39,7 @@ export async function completeLesson(
   id: string,
   courseId?: string,
   base = "/",
+  onStage?: (stage: "interaction" | "feedback") => Promise<void>,
 ) {
   const lesson = curriculum.get("lesson", id)!;
   await page.goto(
@@ -51,7 +52,50 @@ export async function completeLesson(
   const block = lesson.blocks[0];
   if (block?.kind !== "repository" && block) {
     const exercise = page.locator('[data-exercise="' + block.id + '"]');
+    if (["motion", "binary", "markup", "sampling"].includes(block.kind)) {
+      const name = {
+        motion: "检查运动挑战",
+        binary: "检查二进制挑战",
+        markup: "检查网页结构",
+        sampling: "检查采样挑战",
+      }[block.kind as "motion" | "binary" | "markup" | "sampling"];
+      await exercise.getByRole("button", { name, exact: true }).click();
+      await expect(exercise.getByRole("status")).toContainText("还需调整");
+    }
     switch (block.kind) {
+      case "motion":
+        await exercise
+          .getByRole("combobox", { name: "移动速度" })
+          .selectOption("3");
+        for (let n = 0; n < 4; n++)
+          await exercise.getByRole("button", { name: "向右移动" }).click();
+        await exercise.getByRole("button", { name: "检查运动挑战" }).click();
+        break;
+      case "binary":
+        for (const n of [8, 2])
+          await exercise
+            .getByRole("button", { name: `位权 ${n}`, exact: true })
+            .click();
+        await exercise.getByRole("button", { name: "检查二进制挑战" }).click();
+        for (const n of [8, 4, 2, 1])
+          await exercise
+            .getByRole("button", { name: `位权 ${n}`, exact: true })
+            .click();
+        await exercise.getByRole("button", { name: "检查二进制挑战" }).click();
+        break;
+      case "markup":
+        await exercise
+          .getByRole("textbox", { name: "HTML 源码" })
+          .fill(
+            '<h1>我的活动</h1><p>欢迎参加</p><button type="button">了解活动</button>',
+          );
+        await exercise.getByRole("button", { name: "检查网页结构" }).click();
+        break;
+      case "sampling":
+        await exercise.getByRole("combobox").selectOption("4");
+        await exercise.getByRole("combobox").selectOption("8");
+        await exercise.getByRole("button", { name: "检查采样挑战" }).click();
+        break;
       case "numeric":
         await exercise.getByRole("spinbutton").fill(String(exerciseProofs[id]));
         await exercise
@@ -122,6 +166,22 @@ export async function completeLesson(
     }
     await expect(exercise.getByRole("status")).toContainText("练习检查通过");
   }
+  await onStage?.("interaction");
+  if (onStage) {
+    for (const r of lesson.assessmentRefs) {
+      const a = curriculum.get("assessment", r.id)!;
+      await page
+        .getByRole("group", { name: a.question, exact: true })
+        .getByRole("radio")
+        .nth((a.correct + 1) % a.options.length)
+        .check();
+    }
+    await page.getByRole("button", { name: "检查答案", exact: true }).click();
+    await expect(
+      page.locator(".panel-result").getByRole("status"),
+    ).toContainText("再想一想");
+    await choosePanel(page, "练习");
+  }
   for (const r of lesson.assessmentRefs) {
     const a = curriculum.get("assessment", r.id)!;
     await page
@@ -134,4 +194,5 @@ export async function completeLesson(
   await expect(page.locator(".panel-result").getByRole("status")).toContainText(
     "已保存学习进度",
   );
+  await onStage?.("feedback");
 }

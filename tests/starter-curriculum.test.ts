@@ -71,7 +71,7 @@ describe("ten authored starter modules", () => {
       ).toBe(1);
     ledger = mergeLedgers(ledger, {
       ...emptyLedger(),
-      evidence: [evidenceFor("web-request")],
+      evidence: [evidenceFor("web-request"), evidenceFor("web-structure")],
     });
     expect(
       courseProgress(ref("course", "course.web-starter"), ledger, curriculum)

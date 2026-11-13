@@ -50,6 +50,7 @@ const base = {
   level: z.enum(["beginner", "intermediate", "advanced"]),
   kind: z.enum(["course", "practice"]),
   minutes: z.number().optional(),
+  qualityState: z.enum(["draft", "in-development", "published"]).optional(),
 };
 export const courseSchema = z.discriminatedUnion("status", [
   z.object({ ...base, status: z.literal("available"), route: z.string() }),
@@ -86,11 +87,14 @@ export function academyCourses(id: string): CourseEntry[] {
       status: "planned",
     },
   ];
-  const starter = curriculum.get("course", "course." + id + "-starter");
+  const starter =
+    curriculum.get("course", "course." + id + "-quality") ||
+    curriculum.get("course", "course." + id + "-starter");
   if (starter?.status === "available")
     courses[0] = {
       ...courses[0],
       id: starter.id,
+      qualityState: starter.quality?.state,
       title: starter.title,
       description: starter.description,
       status: "available",
@@ -104,6 +108,7 @@ export function academyCourses(id: string): CourseEntry[] {
   if (id === "opensource")
     courses.push({
       id: "os-m01",
+      qualityState: "in-development",
       title: "开源素养 M01",
       description: "保留原六课、检查题与决策工作表。",
       level: "beginner",
@@ -142,7 +147,9 @@ export function academyCourses(id: string): CourseEntry[] {
 export function academyAvailability(id: string) {
   const entries = academyCourses(id);
   return entries.some((c) => c.status === "available" && c.kind === "course")
-    ? "课程可学习"
+    ? entries.some((c) => c.qualityState === "published")
+      ? "入门单元可学习"
+      : "课程开发中 · 可试学"
     : entries.some((c) => c.status === "available")
       ? "实践可用 · 课程规划中"
       : entries.some((c) => c.status === "in-development")

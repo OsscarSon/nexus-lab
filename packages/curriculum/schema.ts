@@ -1,3 +1,4 @@
+import { qualitySchema } from "./quality";
 import { z } from "zod";
 export const kinds = [
   "academy",
@@ -38,6 +39,10 @@ const base = {
 const objectives = z.array(z.string().min(1)).min(1);
 export const interactionSchema = z.discriminatedUnion("kind", [
   z.object({ kind: z.literal("repository"), id }),
+  z.object({ kind: z.literal("motion"), id }),
+  z.object({ kind: z.literal("binary"), id }),
+  z.object({ kind: z.literal("markup"), id }),
+  z.object({ kind: z.literal("sampling"), id }),
   z.object({
     kind: z.literal("numeric"),
     id,
@@ -104,6 +109,9 @@ export const lessonSchema = z
     kind: z.literal("lesson"),
     objectives,
     summary: z.string(),
+    prerequisites: z.array(z.string()).optional(),
+    challenge: z.string().optional(),
+    nextStep: z.string().optional(),
     segments: z
       .array(z.object({ heading: z.string(), body: z.string().min(1) }))
       .min(1),
@@ -157,6 +165,7 @@ export const entitySchema = z.discriminatedUnion("kind", [
   z.object({
     ...base,
     kind: z.literal("course"),
+    quality: qualitySchema.optional(),
     description: z.string(),
     outcomes: objectives,
     moduleRefs: refs("module"),

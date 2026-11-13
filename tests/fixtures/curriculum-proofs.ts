@@ -26,6 +26,11 @@ export const exerciseProofs: Record<string, unknown> = {
     audience: "小学生",
     constraint: "三句话",
   },
+  "games-motion": [3, 3, 3, 3],
+  "engineering-binary": [10, 5],
+  "web-structure":
+    '<h1>我的活动</h1><p>欢迎参加</p><button type="button">了解活动</button>',
+  "future-sampling": [3, 4, 8],
   "games-score": ["collect", "collect", "collect"],
   "engineering-and": [false, false, false, true],
   "web-request": { method: "GET", path: "/weather" },

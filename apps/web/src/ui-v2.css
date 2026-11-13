@@ -2254,3 +2254,45 @@ a {
     max-width: 100%;
   }
 }
+.quality-exercise textarea {
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  padding: 12px;
+  font: inherit;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.quality-preview {
+  background: #edf7f2;
+  color: #174d3b;
+  padding: 16px;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+.quality-track {
+  position: relative;
+  height: 80px;
+  background: #edf7f2;
+  border-bottom: 4px solid #a9cdbd;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+.quality-track span {
+  position: absolute;
+  top: 22px;
+  color: #155d49;
+}
+.quality-player {
+  transition: left 180ms ease;
+}
+.quality-sampling {
+  display: block;
+  width: 100%;
+  max-height: 240px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .quality-player {
+    transition: none;
+  }
+}

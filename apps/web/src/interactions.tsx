@@ -1,3 +1,4 @@
+import { QualityInteraction } from "./quality-interactions";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { Interaction } from "../../../packages/curriculum/schema";
@@ -41,6 +42,13 @@ export function InteractiveBlock({
     setMessage("");
     onEvidence(undefined);
   }
+  if (
+    block.kind === "motion" ||
+    block.kind === "binary" ||
+    block.kind === "markup" ||
+    block.kind === "sampling"
+  )
+    return <QualityInteraction block={block} onEvidence={onEvidence} />;
   if (block.kind === "repository")
     return (
       <div className="example-card">
@@ -381,7 +389,12 @@ export function InteractiveBlock({
       let output = "";
       if (typeof value === "string") {
         try {
-          output = String(evaluateFormula(value, { B2: "12", B3: "18" }));
+          output = String(
+            evaluateFormula(value, {
+              B2: fields.b2 ?? "12",
+              B3: fields.b3 ?? "18",
+            }),
+          );
         } catch (e) {
           output = e instanceof Error ? e.message : "计算失败";
         }
@@ -390,9 +403,26 @@ export function InteractiveBlock({
         <>
           <p>{block.description}</p>
           <p>
-            B2 = 12，B3 = 18。使用已有公式解释器；支持
+            修改输入，观察公式如何更新。使用已有公式解释器；支持
             SUM、引用和基础运算，不是完整 Excel。
           </p>
+          {[
+            ["b2", "B2 材料费", "12"],
+            ["b3", "B3 场地费", "18"],
+          ].map(([id, label, initial]) => (
+            <label key={id}>
+              {label}
+              <input
+                value={fields[id] ?? initial}
+                maxLength={30}
+                onChange={(e) => {
+                  setFields({ ...fields, [id]: e.target.value });
+                  setMessage("");
+                  onEvidence(undefined);
+                }}
+              />
+            </label>
+          ))}
           <label>
             预算公式
             <input
@@ -439,11 +469,18 @@ export function InteractiveBlock({
                   e.id === lab.id &&
                   e.version === lab.version,
               );
+              setValue(e?.proof);
               check(e?.proof);
             }}
           >
             验证已保存实验
           </button>
+          {value !== null &&
+            typeof value === "object" &&
+            "output" in value &&
+            typeof value.output === "string" && (
+              <pre aria-label="已保存的实验输出">{value.output}</pre>
+            )}
           <p className="fine">
             需要在同一浏览器/来源保存通过记录。已有兼容记录也可抵扣本练习；仍需完成本课检查题。
           </p>

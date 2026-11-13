@@ -1,3 +1,4 @@
+import { passesQuality } from "./quality";
 import {
   catalogSchema,
   type Catalog,
@@ -70,6 +71,12 @@ export function validateCatalog(input: unknown): Catalog {
   }
   const edges = new Map<string, string[]>();
   for (const e of catalog.entities) {
+    if (
+      e.kind === "course" &&
+      e.quality?.state === "published" &&
+      !passesQuality(e.quality.scores)
+    )
+      throw Error("Curriculum quality gate failed: " + e.id);
     references(e).forEach(check);
     edges.set(key(e), children(e).map(key));
     if (e.kind === "lesson") {

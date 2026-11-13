@@ -1,3 +1,4 @@
+import { qualityLabel } from "../../../packages/curriculum/quality";
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { academies } from "../../../content/catalog";
@@ -529,7 +530,7 @@ function CourseCard({
           {c.status !== "available"
             ? publicationLabels[c.status]
             : c.kind === "course"
-              ? "可学习"
+              ? qualityLabel(course?.quality)
               : "实践可用"}
         </Badge>
         <span className="fine">
@@ -675,7 +676,16 @@ export function CourseDetails() {
       <div className="card">
         <Badge muted={course.status !== "available"}>
           {course.status === "available"
-            ? "已发布 · 可学习"
+            ? course.kind === "practice"
+              ? "实践可用"
+              : qualityLabel(
+                  curriculum.get(
+                    "course",
+                    course.id === "os-m01"
+                      ? "course.opensource-literacy"
+                      : course.id,
+                  )?.quality,
+                )
             : publicationLabels[course.status] + " · 尚未开放"}
         </Badge>
         <h2>学习目标与准备</h2>

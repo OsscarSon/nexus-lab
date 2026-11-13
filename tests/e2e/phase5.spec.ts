@@ -23,20 +23,20 @@ test("all ten starter modules complete through real interactions and shared once
       page.getByRole("progressbar", { name: "课程完成进度" }),
     ).toHaveAttribute("value", String(item.lessonIds.length));
   }
-  expect(completed.size).toBe(14);
+  expect(completed.size).toBe(18);
   const evidence = await page.evaluate(
     () =>
       JSON.parse(localStorage.getItem("nexus-curriculum-progress")!).evidence,
   );
   expect(
     evidence.filter((e: { kind: string }) => e.kind === "lesson"),
-  ).toHaveLength(14);
+  ).toHaveLength(18);
   expect(
     evidence.filter((e: { id: string }) => e.id === "shared-api-basics"),
   ).toHaveLength(1);
   await page.goto("/projects");
   await page.getByRole("button", { name: "课程成果", exact: true }).click();
-  await expect(page.locator(".project-card")).toHaveCount(10);
+  await expect(page.locator(".project-card")).toHaveCount(14);
   await page.reload();
   await expect(
     page.getByRole("heading", { name: "你的创造，从这里生长。" }),

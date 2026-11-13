@@ -1,3 +1,4 @@
+import { applyQualityReview } from "./quality";
 import { addStarterCurriculum } from "./starter-curriculum";
 import { academies } from "./catalog";
 import { pythonSamples } from "./python";
@@ -149,5 +150,5 @@ export function baseCatalog(): Catalog {
   };
 }
 export const curriculum = new CurriculumRegistry(
-  addStarterCurriculum(baseCatalog()),
+  applyQualityReview(addStarterCurriculum(baseCatalog())),
 );

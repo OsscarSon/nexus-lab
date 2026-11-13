@@ -1,3 +1,4 @@
+import { checkQualityInteraction } from "./quality-evidence";
 import { z } from "zod";
 import type { Interaction, Lesson, ContentRef } from "./schema";
 import { CurriculumRegistry, key } from "./registry";
@@ -87,6 +88,12 @@ export function checkInteraction(
   const parsed = object(value);
   const p = parsed.success ? parsed.data : {};
   switch (block.kind) {
+    case "motion":
+    case "binary":
+    case "markup":
+    case "sampling":
+      passed = checkQualityInteraction(block.kind, value);
+      break;
     case "repository":
       passed = true;
       break;
@@ -163,7 +170,31 @@ export function checkInteraction(
     passed,
     feedback: passed
       ? "练习检查通过：你的操作满足本课目标。"
-      : "还需调整：请对照任务的输入、条件和结果再检查一次。",
+      : "还需调整：" +
+          (
+            {
+              motion: "用指定步长经过金币，继续到墙边。",
+              binary: "先表示 10，再表示 5。",
+              markup: "检查三个受支持的标签及按钮 type。",
+              sampling: "比较 3、4、8 Hz，最终选择 8。",
+              numeric: "先把数值代入表达式，注意乘法与加法的区别。",
+              prompt:
+                "检查目标是否包含任务、是否写明读者，以及输出约束。结构完整仍不保证事实正确。",
+              game: "先观察分数，再比较胜利条件：需要至少达到目标，而不是只点检查。",
+              logic: "按每行输入重新计算；AND 仅在两个输入均为 1 时输出 1。",
+              request:
+                "读取应使用 GET；核对任务要求的资源路径，不要把密码写入路径。",
+              permissions:
+                "只保留读取任务必需的权限；多选写入或管理员权限也不能通过。",
+              sensor: "把挑战温度和阈值比较：大于或等于才开启，注意等于边界。",
+              classification:
+                "按每句的证据或许可条款分类，不依靠自信程度、价格或公开程度。",
+              formula:
+                "公式需对不同金额都能求和；避免固定答案，并检查引用、函数和除零错误。",
+              "lab-evidence":
+                "先在同一来源完成指定实验并保存，再返回验证；只打开实验不算运行。",
+            } as Record<string, string>
+          )[block.kind] || "还需调整：请检查输入和规则。",
   };
 }
 export const evidenceSchema = z
