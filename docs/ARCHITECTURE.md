@@ -1,5 +1,8 @@
 # Technical Architecture v1
 
+> Phase 5.5：正式课程质量状态使用 `quality.state`，与旧引擎技术可访问性 `status` 分开。总分至少 25/30 且每项至少 4/5 才正式发布。新增学科挑战采用新课程/模块/路径/项目身份，旧 v1 要求与完成证据不变；本轮真实范围见 [课程质量清单](CURRICULUM_QUALITY.md) 和 [当前状态](CURRENT_STATUS.md)。
+
+
 ## Stack recommendation
 
 pnpm workspace monorepo; TypeScript; React + Vite for lightweight PWA MVP, React Router, TanStack Query, Tailwind or CSS variables (choose one styling approach), Zod input schemas, Vitest + Testing Library, Playwright smoke E2E. Server API: Cloudflare Workers (Hono optional) OR conventional Node server, select one based on deployment constraints. Database: managed PostgreSQL for users/progress/project metadata when needed; anonymous/local onboarding stored locally before account creation. Storage: object store for user projects. Avoid microservices in MVP. Server-side OpenAI-compatible provider adapters must be modular and vendor-neutral.

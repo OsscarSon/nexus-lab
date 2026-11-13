@@ -1,3 +1,11 @@
+# Phase 5.5 当前课程清单说明
+
+当前主模块见 [CURRICULUM_QUALITY.md](CURRICULUM_QUALITY.md)。新增 games-motion / engineering-binary / web-structure / future-sampling 四课，分别以新的 course/module/path/project 的 `*-quality` 身份编排；对应旧 `*-starter` v1 要求与成果保持不变。现有 18 个唯一入门课时、22 个主模块引用位置，另保留原 M01 六课。九个主入门模块通过内部质量门槛，AI 与旧版模块保持 In Development。
+
+以下为 Phase 5 分支原始清单，保留作兼容对照；其“已发布”描述仅代表旧版本的可访问性，不表示通过 Phase 5.5 新质量门槛。
+
+---
+
 # Phase 5 — 已发布入门课程清单
 
 每个学院同级展示一个新入门课程。以下均为 available，不表示学院的完整课程体系已完成；进阶、高阶仍为 planned。新课共 14 个唯一课时、18 个路径引用位置、10 个模块、10 个课程项目模板。另保留旧开源 M01 六课与分类工作表。

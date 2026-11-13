@@ -1,5 +1,7 @@
 # NEXUS LAB
 
+Phase 5.5 当前范围：九个经过内部质量评审的入门模块与一个 AI 试学模块；不代表十套完整学院课程。完整评分、来源、兼容策略与测试见 [课程质量清单](docs/CURRICULUM_QUALITY.md) 和 [当前状态](docs/CURRENT_STATUS.md)。旧课程/作品/进度继续保留。
+
 Chinese-first interactive technology academy. All ten academies are equally important and share one learning platform; Open Source M01 is the first implementation example, not a central academy. UI V2 provides academy-neutral presentation and shared practice entry points. Phase 5 adds a validated shared curriculum graph, generic lessons, backward-compatible progress migration, and ten real beginner modules. See the [published content inventory](docs/CONTENT_INVENTORY.md). See [product principles](docs/PRODUCT_SPEC.md), [architecture](docs/ARCHITECTURE.md), [roadmap](docs/ROADMAP.md) and [current implementation status](docs/CURRENT_STATUS.md).
 
 ## Development

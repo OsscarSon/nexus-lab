@@ -1,3 +1,52 @@
+# 当前状态 — Phase 5.5（2026-11-13）
+
+开发前已 fetch 最新 main：`fb28a6f5f3a6949ac7408489ca7bd56e7c607d83`。main 当时仅含旧 Phase 0–4 与架构文档；进一步检查所有远程分支和 Actions，确认 `feature/phase5-curriculum` 的 `db6e7c7` 已包含 UI V2 及 Phase 5A–5D。该分支没有合入 main，不能把“main 尚未实现”写成“仓库从未实现”。本次升级基于完整的 Phase 5 分支历史，保留其所有提交、内容身份、迁移与 UI。
+
+早期基于 main 的探索代码已在本机 `work` 分支保存（`76c4428`、`54c2795`），不合入交付分支，也不把其测试/截图作为最终版本证据。当前开发分支为 `phase5.5-quality`。
+
+## Phase 5 实际检查
+
+| 部分 | 分支已有实现与核实 | 本轮处理 |
+| --- | --- | --- |
+| 5A | 十学院中立入口、无默认引导、真实活动续学、课程与规划状态 | 保留 UI V2；增加正式课程质量发布状态，避免“能访问”冒充达标 |
+| 5B | Academy/Topic/Path/Course/Module/Lesson/Assessment/Project/Lab 注册表，确切版本引用、循环/悬空/硬依赖校验与唯一计数 | 保留引擎；增加质量双门槛校验与四种学科互动契约 |
+| 5C | 通用渲染、服务端同量规验证、v1→独立 v2 键、原文备份、SQLite 事务备份、未知/损坏/旧版本保留、共享证据与作品 | 原协议和迁移不改；新互动复用同一证据管线；额外测试旧课程/模块/路径/项目要求不变 |
+| 5D | 十学院各有入门模块，14 个唯一新课时、18 个引用位置；实际完成尚不等于教学质量达标 | 补来源、先修、独立任务、教学步骤、具体错误反馈；新增四课，质量评审后九个主模块达标、AI 开发中 |
+
+Phase 5A–5D 的入门范围已有真实实现，最终本轮重新执行完整验证。十套完整学院课程、进阶/高阶与大作品仍未完成。此前历史检查记录保留于本文后半部分，不能用旧记录替代本次结果。
+
+## Phase 5.5 交付范围
+
+- 在共享引擎与 UI V2 上新增 `games-motion`、`engineering-binary`、`web-structure`、`future-sampling`：可操作 2D 运动/金币/墙碰撞、位权 10→5 挑战、受限 HTML 即时预览、2 Hz 信号采样比较。教学模拟标识明确；不执行任意 HTML、脚本、外部仓库或硬件操作。
+- 新增四个 `*-quality` 课程/模块/路径/项目身份。原 games/engineering/web/future 的 `*-starter` v1 要求、旧课时、原项目和旧路径保持不变；不静默撤销已完成学习。共有 18 个唯一入门课时（另有旧 M01 六课），十个当前主模块按 22 个位置引用；共享 API/Git/证据内容不复制。
+- 既有真实 Python 与公式解释器继续复用；公式课可改变预算数据；检查反馈按学科给出具体原因；课程介绍公开来源、目标、先修、挑战与后续学习方向。
+- 正式课程质量发布状态为 `quality.state`，和兼容引擎的技术访问 `status` 分开。未达标仍可明确试学，但不能显示为完整发布课程。九个主入门模块 25/30；AI 23/30；旧 M01 21/30、旧四个短模块 22/30，均保持 In Development。
+- 评分是限定入门范围的内部评审，非外部专家、真实初学者效果或实体手机认证。完整量规、逐学院分数、来源/许可证与边界见 [CURRICULUM_QUALITY.md](CURRICULUM_QUALITY.md)。
+- `AGENTS.md` 已加入长期开发和安全同步 main 规则：fetch/保护工作、小型提交、必要全套检查与泄露扫描、仅普通 merge/快进、不强推、冲突/失败/权限问题停止同步；推送与部署分别核对。用户已授权默认安全同步，无需重复询问。
+
+## 本次验证与发布证据
+
+代码检查与生产构建：typecheck、lint、91 项 unit/API 测试均通过；首次完整新 UI 回归 60 项通过。随后针对旧 v1 要求兼容做了身份隔离修正，最终完整回归与 Pages 检查另记录于下方，不能以首次结果代替最终结果。
+
+当前环境直接访问 `api.github.com`、`osscarson.github.io` 曾被网络策略拒绝；已保存仅增加这两域名的环境配置草稿。草稿不会自动生效。GitHub 主站与 Git 代理可读；Actions 可通过主站页面核对。GitHub main 推送/最终部署以实际结果为准。
+
+
+### 最终版本验证（代码提交 f622f15）
+
+- `pnpm typecheck`、`pnpm lint`、`pnpm test`：通过，11 文件共 91 项测试，无失败/跳过。
+- `pnpm build`、`CHROMIUM_PATH=/usr/bin/chromium pnpm test:production`：通过，生产 CSP 下真实 Python 与诚实回退 1 项通过。
+- `CHROMIUM_PATH=/usr/bin/chromium pnpm test:e2e`：60 项全部通过，包括原 Phase 0–5、UI V2、十学院完整入门模块、共享证据、旧进度/账号/实验、手机面板、可访问性与溢出检查。
+- `pnpm build:pages`、`CHROMIUM_PATH=/usr/bin/chromium pnpm test:pages`：28 项全部通过，真实静态子路径、刷新、Python、无后端请求及十学院模块。
+- 截图定位修正后，分别针对开发与 Pages 的十学院模块再执行 20 项截图旅程，均通过；只重拍需要的部分，没有把截图重跑当作额外课程范围。120 张原图（两模式各 60）及完整反馈画面已保留、审阅，索引 `/workspace/artifacts/phase-5.5/index.html`，附 SHA-256 manifest。
+- `pnpm audit --prod`：无已知漏洞。Gitleaks 8.24.3 官方发布包经过 SHA-256 校验；历史、待交付文件快照、Pages 与完整应用产物扫描均未发现泄露。扫描器/报告在忽略的 `.cache`，截图在 checkout 外；无数据文件、凭据或构建产物提交到仓库。
+- 最后重新执行普通 `pnpm build`，本机 dist 已恢复完整应用模式。构建只有既有 Zod 注解提示。没有真实 AI provider、外部专家/学习者、实体设备或公共 HTTPS 账户部署验证。
+
+下一步：优先补 AI 语义/输出评价与旧 M01 的独立实践，再均衡扩展各学院后续模块；按质量量规复审，保留旧证据与新要求身份隔离。推送前已再次 fetch main，仍为 fb28a6f，属于本开发分支祖先；最终 main 推送及部署状态以交付报告的远程 SHA/Actions 证据为准。
+
+---
+
+## 以下为历史阶段记录
+
 # Current status
 
 Phases 0–3 remain implemented; Phase 4 accounts/sync, gateway controls and non-generative assistance remain available, while live AI still requires unconfigured provider credentials. UI/UX V2 is implemented on `develop/ui-v2`; its current validation and limitations are summarized in the final UI V2 section below. This branch has not been pushed or deployed.
